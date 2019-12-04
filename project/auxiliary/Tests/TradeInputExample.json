@@ -1,0 +1,19 @@
+[
+	{"operation":"init","timeout":10},
+	{"operation":"buy" ,"elapsed": 1,"amount":"6000000"},
+	{"operation":"buy" ,"elapsed": 1,"amount":"6000000"},
+	{"operation":"buy" ,"elapsed": 1,"amount":"6000000"},
+	{"operation":"buy" ,"elapsed": 1,"amount":"6000000"},
+	{"operation":"buy" ,"elapsed": 1,"amount":"6000000"},
+	{"operation":"buy" ,"elapsed": 1,"amount":"6000000"},
+	{"operation":"sell","elapsed": 1,"amount":"6000000"},
+	{"operation":"sell","elapsed": 1,"amount":"6000000"},
+	{"operation":"sell","elapsed": 1,"amount":"6000000"},
+	{"operation":"buy" ,"elapsed": 1,"amount":"6000000"},
+	{"operation":"buy" ,"elapsed": 1,"amount":"6000000"},
+	{"operation":"buy" ,"elapsed": 1,"amount":"6000000"},
+	{"operation":"buy" ,"elapsed": 1,"amount":"6000000"},
+	{"operation":"buy" ,"elapsed": 1,"amount":"6000000"},
+	{"operation":"buy" ,"elapsed": 1,"amount":"6000000"},
+	{"operation":"info"}
+]
