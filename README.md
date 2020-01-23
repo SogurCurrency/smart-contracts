@@ -33,3 +33,6 @@ In addition to its ERC-20 (i.e. transferability) utility, the SGN token can be c
 The conversion is done by either:
   1. calling the `convert(value)` function, with `value` the amount of SGN tokens (in wei) to be converted.
   2. calling the `transfer(to, value)` function, with the contract's address as `to` and the amount to be converted as `value`.
+
+
+###### *Special thanks to [barakman](https://github.com/barakman) for his contribution*
