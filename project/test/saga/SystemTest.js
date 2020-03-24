@@ -31,10 +31,12 @@ contract("SystemTest", function(accounts) {
         let rateApprover;
         let transactionLimiter;
         let transactionManager;
-        let walletsTradingDataSource;
+        let buyWalletsTradingDataSource;
+        let sellWalletsTradingDataSource;
+        let sgaBuyWalletsTradingLimiter;
+        let sgaSellWalletsTradingLimiter;
         let sgnTokenManager;
         let sgaTokenManager;
-        let sgaWalletsTradingLimiter;
         let reserveManager;
         let paymentManager;
         let paymentQueue;
@@ -56,17 +58,21 @@ contract("SystemTest", function(accounts) {
             rateApprover          = await artifacts.require("RateApprover"         ).new(contractAddressLocatorProxy.address);
             transactionLimiter          = await artifacts.require("TransactionLimiter"         ).new(contractAddressLocatorProxy.address);
             transactionManager          = await artifacts.require("TransactionManager"         ).new(contractAddressLocatorProxy.address);
-            walletsTradingDataSource           = await artifacts.require("WalletsTradingDataSource"          ).new(contractAddressLocatorProxy.address);
+            buyWalletsTradingDataSource             = await artifacts.require("WalletsTradingDataSource"            ).new(contractAddressLocatorProxy.address);
+            sellWalletsTradingDataSource             = await artifacts.require("WalletsTradingDataSource"            ).new(contractAddressLocatorProxy.address);
+            sgaBuyWalletsTradingLimiter             = await artifacts.require("SGABuyWalletsTradingLimiter"            ).new(contractAddressLocatorProxy.address);
+            sgaSellWalletsTradingLimiter             = await artifacts.require("SGASellWalletsTradingLimiter"            ).new(contractAddressLocatorProxy.address);
             sgnTokenManager             = await artifacts.require("SGNTokenManager"            ).new(contractAddressLocatorProxy.address);
             sgaTokenManager             = await artifacts.require("SGATokenManager"            ).new(contractAddressLocatorProxy.address);
-            sgaWalletsTradingLimiter              = await artifacts.require("SGAWalletsTradingLimiter"                   ).new(contractAddressLocatorProxy.address);
             reserveManager              = await artifacts.require("ReserveManager"             ).new(contractAddressLocatorProxy.address);
             paymentManager                 = await artifacts.require("PaymentManager"                ).new(contractAddressLocatorProxy.address);
             paymentQueue                   = await artifacts.require("PaymentQueue"                  ).new(contractAddressLocatorProxy.address);
             monetaryModel                   = await artifacts.require("MonetaryModel"                  ).new(contractAddressLocatorProxy.address);
             await require("./helpers/ModelDataSource.js").initialize(modelDataSource);
             await authorizationDataSource.accept(admin, {from: owner});
-            await authorizationDataSource.upsertOne(wallet, Date.now(), true, -1, -1, 0, {from: admin});
+            await buyWalletsTradingDataSource.setAuthorizedExecutorsIdentifier(["BuyWalletsTLSGATokenManager"], {from: owner});
+            await sellWalletsTradingDataSource.setAuthorizedExecutorsIdentifier(["SellWalletsTLSGATokenManager"], {from: owner});
+            await authorizationDataSource.upsertOne(wallet, Date.now(), true, -1, -1, -1, 0, {from: admin});
             await walletsTradingLimiterValueConverter.accept(owner);
             await ethConverter.accept(owner);
         });
@@ -103,10 +109,12 @@ contract("SystemTest", function(accounts) {
                         ["IETHConverter"   , ethConverter   .address],
                         ["ITransactionLimiter"     , transactionLimiter     .address],
                         ["ITransactionManager"     , transactionManager     .address],
-                        ["IWalletsTradingDataSource"      , walletsTradingDataSource      .address],
+                        ['BuyWalletsTradingDataSource'      ,buyWalletsTradingDataSource      .address],
+                        ['SellWalletsTradingDataSource'      ,sellWalletsTradingDataSource      .address],
+                        ["BuyWalletsTLSGATokenManager"         , sgaBuyWalletsTradingLimiter         .address],
+                        ["SellWalletsTLSGATokenManager"         , sgaSellWalletsTradingLimiter         .address],
                         ["ISGNTokenManager"        , sgnTokenManager        .address],
                         ["ISGATokenManager"        , sgaTokenManager        .address],
-                        ["WalletsTLSGATokenManager"         , sgaWalletsTradingLimiter         .address],
                         ["IReserveManager"         , reserveManager         .address],
                         ["IPaymentManager"            , paymentManager            .address],
                         ["IPaymentQueue"              , paymentQueue              .address],

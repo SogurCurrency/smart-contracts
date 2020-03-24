@@ -13,31 +13,36 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
  * @title Wallets Trading Data Source.
  */
 contract WalletsTradingDataSource is IWalletsTradingDataSource, ContractAddressLocatorHolder, Adminable {
-    string public constant VERSION = "1.0.0";
+    string public constant VERSION = "1.1.0";
 
     using SafeMath for uint256;
 
     mapping(address => uint256) public values;
 
-    bytes32[] public walletTradingLimitersContractLocatorIdentifier;
+    bytes32[] public authorizedExecutorsIdentifier;
+
+    event TradingWalletUpdated(address indexed _wallet, uint256 _value, uint256 _limit, uint256 _newValue);
 
     /**
      * @dev Create the contract.
      * @param _contractAddressLocator The contract address locator.
      */
-    constructor(IContractAddressLocator _contractAddressLocator) ContractAddressLocatorHolder(_contractAddressLocator) public {
-        bytes32[] memory _walletTradingLimitersContractLocatorIdentifier = new bytes32[](2);
-        _walletTradingLimitersContractLocatorIdentifier[0] = _WalletsTradingLimiter_SGNTokenManager_;
-        _walletTradingLimitersContractLocatorIdentifier[1] = _WalletsTradingLimiter_SGATokenManager_;
-        walletTradingLimitersContractLocatorIdentifier = _walletTradingLimitersContractLocatorIdentifier;
+    constructor(IContractAddressLocator _contractAddressLocator) ContractAddressLocatorHolder(_contractAddressLocator) public {}
+
+    /**
+     * @dev Reverts if called by any address other than one of the authorized executors.
+     */
+    modifier onlyAuthorizedExecutors {
+        require(isSenderAddressRelates(authorizedExecutorsIdentifier), "caller is illegal");
+        _;
     }
 
     /**
-     * @dev Reverts if called by any address other than one of the wallet trading limiters.
+     * @dev Set the authorized executors identifier.
+     * @param _authorizedExecutorsIdentifier The authorized executors identifier list.
      */
-    modifier onlyWalletsTradingLimiters {
-        require(isSenderAddressRelates(walletTradingLimitersContractLocatorIdentifier), "caller is illegal");
-        _;
+    function setAuthorizedExecutorsIdentifier(bytes32[] _authorizedExecutorsIdentifier) external onlyOwner {
+        authorizedExecutorsIdentifier = _authorizedExecutorsIdentifier;
     }
 
     /**
@@ -46,10 +51,11 @@ contract WalletsTradingDataSource is IWalletsTradingDataSource, ContractAddressL
      * @param _value The value to increment by.
      * @param _limit The limit of the wallet.
      */
-    function updateWallet(address _wallet, uint256 _value, uint256 _limit) external onlyWalletsTradingLimiters {
+    function updateWallet(address _wallet, uint256 _value, uint256 _limit) external onlyAuthorizedExecutors {
         uint256 value = values[_wallet].add(_value);
         require(value <= _limit, "trade-limit has been reached");
         values[_wallet] = value;
+        emit TradingWalletUpdated(_wallet, _value, _limit, value);
     }
 
     /**

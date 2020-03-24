@@ -4,6 +4,7 @@ import "./interfaces/ISGNAuthorizationManager.sol";
 import "../contract_address_locator/ContractAddressLocatorHolder.sol";
 import "../authorization/AuthorizationActionRoles.sol";
 import "../authorization/interfaces/IAuthorizationDataSource.sol";
+import "../wallet_trading_limiter/interfaces/ITradingClasses.sol";
 
 /**
  * Details of usage of licenced software see here: https://www.saga.org/software/readme_v1
@@ -13,7 +14,7 @@ import "../authorization/interfaces/IAuthorizationDataSource.sol";
  * @title SGN Authorization Manager.
  */
 contract SGNAuthorizationManager is ISGNAuthorizationManager, ContractAddressLocatorHolder {
-    string public constant VERSION = "1.0.0";
+    string public constant VERSION = "1.1.0";
 
     using AuthorizationActionRoles for uint256;
 
@@ -31,14 +32,21 @@ contract SGNAuthorizationManager is ISGNAuthorizationManager, ContractAddressLoc
     }
 
     /**
+    * @dev Return the contract which implements the ITradingClasses interface.
+    */
+    function getTradingClasses() public view returns (ITradingClasses) {
+        return ITradingClasses(getContractAddress(_ITradingClasses_));
+    }
+
+    /**
      * @dev Determine whether or not a wallet is authorized to sell SGN.
      * @param _sender The address of the wallet.
      * @return Authorization status.
      */
     function isAuthorizedToSell(address _sender) external view returns (bool) {
-        IAuthorizationDataSource authorizationDataSource = getAuthorizationDataSource();
-        (bool senderIsWhitelisted, uint256 senderActionRole) = authorizationDataSource.getAuthorizedActionRole(_sender);
-        return senderIsWhitelisted && senderActionRole.isAuthorizedToSellSgn();
+        (bool senderIsWhitelisted, uint256 senderActionRole, uint256 senderTradeClassId) = getAuthorizationDataSource().getAuthorizedActionRoleAndClass(_sender);
+
+        return senderIsWhitelisted && getActionRole(senderActionRole, senderTradeClassId).isAuthorizedToSellSgn();
     }
 
     /**
@@ -49,10 +57,12 @@ contract SGNAuthorizationManager is ISGNAuthorizationManager, ContractAddressLoc
      */
     function isAuthorizedToTransfer(address _sender, address _target) external view returns (bool) {
         IAuthorizationDataSource authorizationDataSource = getAuthorizationDataSource();
-        (bool senderIsWhitelisted, uint256 senderActionRole) = authorizationDataSource.getAuthorizedActionRole(_sender);
-        (bool targetIsWhitelisted, uint256 targetActionRole) = authorizationDataSource.getAuthorizedActionRole(_target);
-        return senderIsWhitelisted && senderActionRole.isAuthorizedToTransferSgn()
-            && targetIsWhitelisted && targetActionRole.isAuthorizedToReceiveSgn();
+        (bool senderIsWhitelisted, uint256 senderActionRole, uint256 senderTradeClassId) = authorizationDataSource.getAuthorizedActionRoleAndClass(_sender);
+        (bool targetIsWhitelisted, uint256 targetActionRole, uint256 targetTradeClassId) = authorizationDataSource.getAuthorizedActionRoleAndClass(_target);
+
+        return senderIsWhitelisted && targetIsWhitelisted &&
+        getActionRole(senderActionRole, senderTradeClassId).isAuthorizedToTransferSgn() &&
+        getActionRole(targetActionRole, targetTradeClassId).isAuthorizedToReceiveSgn();
     }
 
     /**
@@ -64,11 +74,21 @@ contract SGNAuthorizationManager is ISGNAuthorizationManager, ContractAddressLoc
      */
     function isAuthorizedToTransferFrom(address _sender, address _source, address _target) external view returns (bool) {
         IAuthorizationDataSource authorizationDataSource = getAuthorizationDataSource();
-        (bool senderIsWhitelisted, uint256 senderActionRole) = authorizationDataSource.getAuthorizedActionRole(_sender);
-        (bool sourceIsWhitelisted, uint256 sourceActionRole) = authorizationDataSource.getAuthorizedActionRole(_source);
-        (bool targetIsWhitelisted, uint256 targetActionRole) = authorizationDataSource.getAuthorizedActionRole(_target);
-        return senderIsWhitelisted && senderActionRole.isAuthorizedToTransferFromSgn()
-            && sourceIsWhitelisted && sourceActionRole.isAuthorizedToTransferSgn()
-            && targetIsWhitelisted && targetActionRole.isAuthorizedToReceiveSgn();
+        (bool senderIsWhitelisted, uint256 senderActionRole, uint256 senderTradeClassId) = authorizationDataSource.getAuthorizedActionRoleAndClass(_sender);
+        (bool sourceIsWhitelisted, uint256 sourceActionRole, uint256 sourceTradeClassId) = authorizationDataSource.getAuthorizedActionRoleAndClass(_source);
+        (bool targetIsWhitelisted, uint256 targetActionRole, uint256 targetTradeClassId) = authorizationDataSource.getAuthorizedActionRoleAndClass(_target);
+
+        return senderIsWhitelisted && sourceIsWhitelisted && targetIsWhitelisted &&
+        getActionRole(senderActionRole, senderTradeClassId).isAuthorizedToTransferFromSgn() &&
+        getActionRole(sourceActionRole, sourceTradeClassId).isAuthorizedToTransferSgn() &&
+        getActionRole(targetActionRole, targetTradeClassId).isAuthorizedToReceiveSgn();
+    }
+
+    /**
+     * @dev Get the relevant action-role.
+     * @return The relevant action-role.
+     */
+    function getActionRole(uint256 _actionRole, uint256 _tradeClassId) private view returns (uint256) {
+        return _actionRole > 0 ? _actionRole : getTradingClasses().getActionRole(_tradeClassId);
     }
 }

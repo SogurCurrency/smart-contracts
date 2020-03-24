@@ -10,13 +10,13 @@ import "../wallet_trading_limiter/WalletsTradingLimiterBase.sol";
  * @title SGA Wallets Trading Limiter.
  */
 contract SGAWalletsTradingLimiter is WalletsTradingLimiterBase {
-    string public constant VERSION = "1.0.0";
+    string public constant VERSION = "1.1.0";
 
     /**
      * @dev Create the contract.
      * @param _contractAddressLocator The contract address locator.
      */
-    constructor(IContractAddressLocator _contractAddressLocator) WalletsTradingLimiterBase(_contractAddressLocator) public {}
+    constructor(IContractAddressLocator _contractAddressLocator, bytes32 _walletsTradingDataSourceIdentifier) WalletsTradingLimiterBase(_contractAddressLocator, _walletsTradingDataSourceIdentifier) public {}
 
 
     /**
@@ -36,7 +36,5 @@ contract SGAWalletsTradingLimiter is WalletsTradingLimiterBase {
         return getWalletsTradingLimiterValueConverter().toLimiterValue(_value);
     }
 }
-
-
 
 

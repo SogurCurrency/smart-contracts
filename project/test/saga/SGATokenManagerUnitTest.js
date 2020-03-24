@@ -35,7 +35,8 @@ contract("SGATokenManagerUnitTest", function(accounts) {
         before(async function() {
             await contractAddressLocatorProxy.set("ISGAAuthorizationManager", sgaAuthorizationManager.address);
             await contractAddressLocatorProxy.set("ITransactionManager"     , transactionManager     .address);
-            await contractAddressLocatorProxy.set("WalletsTLSGATokenManager"         , walletsTradingLimiterMockup         .address);
+            await contractAddressLocatorProxy.set("SellWalletsTLSGATokenManager"         , walletsTradingLimiterMockup         .address);
+            await contractAddressLocatorProxy.set("BuyWalletsTLSGATokenManager"         , walletsTradingLimiterMockup         .address);
             await contractAddressLocatorProxy.set("IReserveManager"         , reserveManager         .address);
             await contractAddressLocatorProxy.set("IPaymentManager"            , paymentManager            .address);
             await contractAddressLocatorProxy.set("IRedButton"              , redButton              .address);
@@ -94,19 +95,15 @@ contract("SGATokenManagerUnitTest", function(accounts) {
         it("function exchangeSgaForEth should complete successfully", async function() {
             await verifyEvent(sgaTokenManager.exchangeSgaForEth(senderWallet, AMOUNT), "ExchangeSgaForEthCompleted");
         });
+        it("function exchangeSgaForEth should abort if exceed limit", async function() {
+                    await walletsTradingLimiterMockup.setPass(false);
+                    await catchRevert(sgaTokenManager.exchangeSgaForEth(senderWallet, AMOUNT));
+        });
         it("function uponTransfer should complete successfully", async function() {
             await verifyEvent(sgaTokenManager.uponTransfer(senderWallet, targetWallet, AMOUNT), "");
         });
-        it("function uponTransfer should abort if exceed limit", async function() {
-            await walletsTradingLimiterMockup.setPass(false);
-            await catchRevert(sgaTokenManager.uponTransfer(senderWallet, targetWallet, AMOUNT));
-        });
         it("function uponTransferFrom should complete successfully", async function() {
             await verifyEvent(sgaTokenManager.uponTransferFrom(senderWallet, sourceWallet, targetWallet, AMOUNT), "");
-        });
-        it("function uponTransferFrom should abort if exceed limit", async function() {
-            await walletsTradingLimiterMockup.setPass(false);
-            await catchRevert(sgaTokenManager.uponTransferFrom(senderWallet, sourceWallet, targetWallet, AMOUNT));
         });
         it("function uponDeposit should complete successfully", async function() {
             await verifyEvent(sgaTokenManager.uponDeposit(senderWallet, BALANCE, AMOUNT), "DepositCompleted");
@@ -152,12 +149,6 @@ contract("SGATokenManagerUnitTest", function(accounts) {
         });
         it("function exchangeSgaForEth should abort with an error if unauthorized", async function() {
             await catchRevert(sgaTokenManager.exchangeSgaForEth(senderWallet, AMOUNT));
-        });
-        it("function uponTransfer should abort with an error if unauthorized", async function() {
-            await catchRevert(sgaTokenManager.uponTransfer(senderWallet, targetWallet, AMOUNT));
-        });
-        it("function uponTransferFrom should abort with an error if unauthorized", async function() {
-            await catchRevert(sgaTokenManager.uponTransferFrom(senderWallet, sourceWallet, targetWallet, AMOUNT));
         });
         it("function uponWithdraw should abort with an error if unauthorized", async function() {
             await catchRevert(sgaTokenManager.uponWithdraw(senderWallet, BALANCE));

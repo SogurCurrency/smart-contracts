@@ -6,7 +6,8 @@ contract AuthorizationDataSourceMockup is IAuthorizationDataSource {
     struct WalletInfo {
         bool isWhitelisted;
         uint256 actionRole;
-        uint256 tradeLimit;
+        uint256 buyLimit;
+        uint256 sellLimit;
         uint256 tradeClass;
     }
 
@@ -16,11 +17,23 @@ contract AuthorizationDataSourceMockup is IAuthorizationDataSource {
         return (walletTable[_wallet].isWhitelisted, walletTable[_wallet].actionRole);
     }
 
-    function getTradeLimitAndClass(address _wallet) external view returns (uint256, uint256) {
-        return (walletTable[_wallet].tradeLimit, walletTable[_wallet].tradeClass);
+    function getAuthorizedActionRoleAndClass(address _wallet) external view returns (bool, uint256, uint256) {
+        return (walletTable[_wallet].isWhitelisted, walletTable[_wallet].actionRole, walletTable[_wallet].tradeClass);
     }
 
-    function set(address _wallet, bool _isWhitelisted, uint256 _actionRole, uint256 _tradeLimit, uint256 _tradeClass) external {
-        walletTable[_wallet] = WalletInfo({isWhitelisted: _isWhitelisted, actionRole: _actionRole, tradeLimit: _tradeLimit, tradeClass: _tradeClass});
+    function getTradeLimitsAndClass(address _wallet) external view returns (uint256, uint256, uint256) {
+        return (walletTable[_wallet].buyLimit, walletTable[_wallet].sellLimit, walletTable[_wallet].tradeClass);
+    }
+
+    function getBuyTradeLimitAndClass(address _wallet) external view returns (uint256, uint256) {
+        return (walletTable[_wallet].buyLimit, walletTable[_wallet].tradeClass);
+    }
+
+    function getSellTradeLimitAndClass(address _wallet) external view returns (uint256, uint256) {
+        return (walletTable[_wallet].sellLimit, walletTable[_wallet].tradeClass);
+    }
+
+    function set(address _wallet, bool _isWhitelisted, uint256 _actionRole, uint256 _buyLimit, uint256 _sellLimit, uint256 _tradeClass) external {
+        walletTable[_wallet] = WalletInfo({isWhitelisted: _isWhitelisted, actionRole: _actionRole, buyLimit: _buyLimit, sellLimit: _sellLimit, tradeClass: _tradeClass});
     }
 }

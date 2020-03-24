@@ -57,10 +57,12 @@ def init(logger,timeout):
     sgaToken                    = Contract('SGAToken'                   ,[contractAddressLocatorProxy.address        ])
     authorizationDataSource     = Contract('AuthorizationDataSource'    ,[                                           ])
     sgaAuthorizationManager     = Contract('SGAAuthorizationManager'    ,[contractAddressLocatorProxy.address        ])
-    walletsTradingDataSource           = Contract('WalletsTradingDataSource'          ,[contractAddressLocatorProxy.address        ])
+    buyWalletsTradingDataSource              = Contract('WalletsTradingDataSource'             ,[contractAddressLocatorProxy.address        ])
+    sellWalletsTradingDataSource              = Contract('WalletsTradingDataSource'             ,[contractAddressLocatorProxy.address        ])
     walletsTradingLimiterValueConverter                = Contract('WalletsTradingLimiterValueConverter'               ,[                                           ])
     tradingClasses              = Contract('TradingClasses'             ,[                                           ])
-    sgaWalletsTradingLimiter              = Contract('SGAWalletsTradingLimiter'             ,[contractAddressLocatorProxy.address        ])
+    sgaBuyWalletsTradingLimiter              = Contract('SGABuyWalletsTradingLimiter'             ,[contractAddressLocatorProxy.address        ])
+    sgaSellWalletsTradingLimiter              = Contract('SGASellWalletsTradingLimiter'             ,[contractAddressLocatorProxy.address        ])
     reserveManager              = Contract('ReserveManager'             ,[contractAddressLocatorProxy.address        ])
     paymentManager                 = Contract('PaymentManager'                ,[contractAddressLocatorProxy.address        ])
     paymentQueue                   = Contract('PaymentQueue'                  ,[contractAddressLocatorProxy.address        ])
@@ -82,10 +84,12 @@ def init(logger,timeout):
         ['ISGAToken'               ,sgaToken               .address],
         ['IAuthorizationDataSource',authorizationDataSource.address],
         ['ISGAAuthorizationManager',sgaAuthorizationManager.address],
-        ['IWalletsTradingDataSource'      ,walletsTradingDataSource      .address],
+        ['BuyWalletsTradingDataSource'      ,buyWalletsTradingDataSource      .address],
+        ['SellWalletsTradingDataSource'      ,sellWalletsTradingDataSource      .address],
         ['IWalletsTradingLimiterValueConverter'           ,walletsTradingLimiterValueConverter           .address],
         ['ITradingClasses'         ,tradingClasses         .address],
-        ['IWalletsTradingLimiter'         ,sgaWalletsTradingLimiter         .address],
+        ["BuyWalletsTLSGATokenManager"         , sgaBuyWalletsTradingLimiter         .address],
+        ["SellWalletsTLSGATokenManager"         , sgaSellWalletsTradingLimiter         .address],
         ['IReserveManager'         ,reserveManager         .address],
         ['IPaymentManager'            ,paymentManager            .address],
         ['IPaymentQueue'              ,paymentQueue              .address],
@@ -98,6 +102,9 @@ def init(logger,timeout):
     initialize(modelDataSource.setter(),logger)
 
     authorizationDataSource.setter().accept(Contract.owner)
+    buyWalletsTradingDataSource.setter().setAuthorizedExecutorsIdentifier(["BuyWalletsTLSGATokenManager"])
+    sellWalletsTradingDataSource.setter().setAuthorizedExecutorsIdentifier(["SellWalletsTLSGATokenManager"])
+
     authorizationDataSource.setter().upsertOne(Contract.owner,1,True,2**256-1,2**256-1,0)
 
     return sgaToken

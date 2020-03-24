@@ -37,9 +37,11 @@ contract ContractAddressLocatorHolder {
     bytes32 internal constant _IMintingPointTimersManager_             = "IMintingPointTimersManager"            ;
     bytes32 internal constant _ITradingClasses_          = "ITradingClasses"         ;
     bytes32 internal constant _IWalletsTradingLimiterValueConverter_        = "IWalletsTLValueConverter"       ;
-    bytes32 internal constant _IWalletsTradingDataSource_       = "IWalletsTradingDataSource"      ;
+    bytes32 internal constant _BuyWalletsTradingDataSource_       = "BuyWalletsTradingDataSource"      ;
+    bytes32 internal constant _SellWalletsTradingDataSource_       = "SellWalletsTradingDataSource"      ;
     bytes32 internal constant _WalletsTradingLimiter_SGNTokenManager_          = "WalletsTLSGNTokenManager"         ;
-    bytes32 internal constant _WalletsTradingLimiter_SGATokenManager_          = "WalletsTLSGATokenManager"         ;
+    bytes32 internal constant _BuyWalletsTradingLimiter_SGATokenManager_          = "BuyWalletsTLSGATokenManager"         ;
+    bytes32 internal constant _SellWalletsTradingLimiter_SGATokenManager_          = "SellWalletsTLSGATokenManager"         ;
     bytes32 internal constant _IETHConverter_             = "IETHConverter"   ;
     bytes32 internal constant _ITransactionLimiter_      = "ITransactionLimiter"     ;
     bytes32 internal constant _ITransactionManager_      = "ITransactionManager"     ;

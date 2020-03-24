@@ -5,7 +5,7 @@ contract("SGNTokenFuncTest", function(accounts) {
     let sgnConversionManager;
     let tradingClasses;
     let walletsTradingLimiterValueConverter;
-    let walletsTradingDataSource;
+    let buyWalletsTradingDataSource;
     let sgnTokenManager;
     let sgnWalletsTradingLimiter;
     let sagaExchanger;
@@ -147,7 +147,7 @@ contract("SGNTokenFuncTest", function(accounts) {
         const sgnAmount = 1000000;
         before(async function() {
             await init();
-            await authorizationDataSource.upsertOne(initWallet, Date.now(), true, -1, -1, 0);
+            await authorizationDataSource.upsertOne(initWallet, Date.now(), true, -1, -1, -1, 0);
         });
         for (let index = minValidIndex; index < arrayLength; index++) {
             it(`index ${index}`, async function() {
@@ -170,7 +170,7 @@ contract("SGNTokenFuncTest", function(accounts) {
         sgnConversionManager        = await artifacts.require("SGNConversionManager"       ).new();
         tradingClasses              = await artifacts.require("TradingClasses"             ).new();
         walletsTradingLimiterValueConverter                = await artifacts.require("WalletsTradingLimiterValueConverter"               ).new();
-        walletsTradingDataSource    = await artifacts.require("WalletsTradingDataSource"   ).new(contractAddressLocatorProxy.address);
+        buyWalletsTradingDataSource    = await artifacts.require("WalletsTradingDataSource"   ).new(contractAddressLocatorProxy.address);
         sgnTokenManager             = await artifacts.require("SGNTokenManager"            ).new(contractAddressLocatorProxy.address);
         sgnWalletsTradingLimiter    = await artifacts.require("SGNWalletsTradingLimiter"   ).new(contractAddressLocatorProxy.address);
         sagaExchanger               = await artifacts.require("SagaExchangerMockup"        ).new();
@@ -182,7 +182,7 @@ contract("SGNTokenFuncTest", function(accounts) {
             ["ISGNConversionManager"      , sgnConversionManager      .address],
             ["ITradingClasses"         , tradingClasses         .address],
             ["IWalletsTLValueConverter"           , walletsTradingLimiterValueConverter           .address],
-            ["IWalletsTradingDataSource"      , walletsTradingDataSource      .address],
+            ["BuyWalletsTradingDataSource"      , buyWalletsTradingDataSource      .address],
             ["ISGNTokenManager"        , sgnTokenManager        .address],
             ["WalletsTLSGNTokenManager"  , sgnWalletsTradingLimiter         .address],
             ["ISagaExchanger"          , sagaExchanger          .address],
@@ -192,19 +192,19 @@ contract("SGNTokenFuncTest", function(accounts) {
         await contractAddressLocatorProxy.upgrade(contractAddressLocator.address);
         await authorizationDataSource.accept(owner);
         await walletsTradingLimiterValueConverter.accept(owner);
+        await buyWalletsTradingDataSource.setAuthorizedExecutorsIdentifier(["WalletsTLSGNTokenManager"], {from: owner});
     }
 
     async function load() {
         await sgnWalletsTradingLimiter.setSGNMinimumLimiterValue(1,1,1,{from: owner});
         await walletsTradingLimiterValueConverter.setPrice(1,1,1,{from: owner});
-
-        await authorizationDataSource.upsertOne(initWallet, Date.now(), true, -1, -1, 0);
+        await authorizationDataSource.upsertOne(initWallet, Date.now(), true, -1, -1, -1, 0);
         for (const wallet of [mainWallet, authorizedWallet, unauthorizedWallet, unregisteredWallet]) {
-            await authorizationDataSource.upsertOne(wallet, Date.now(), true, -1, -1, 0);
+            await authorizationDataSource.upsertOne(wallet, Date.now(), true, -1, -1, -1, 0);
             await sgnToken.transfer(wallet, initialBalance, {from: initWallet});
             await sgnToken.approve(initWallet, amountToTransfer, {from: wallet});
         }
-        await authorizationDataSource.upsertOne(unauthorizedWallet, Date.now(), false, 0, 0, 0);
+        await authorizationDataSource.upsertOne(unauthorizedWallet, Date.now(), false, 0, 0, 0, 0);
         await authorizationDataSource.removeOne(unregisteredWallet);
     }
 

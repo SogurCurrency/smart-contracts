@@ -18,7 +18,7 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
  * @title SGA Token Manager.
  */
 contract SGATokenManager is ISGATokenManager, ContractAddressLocatorHolder {
-    string public constant VERSION = "1.0.0";
+    string public constant VERSION = "1.1.0";
 
     using SafeMath for uint256;
 
@@ -53,8 +53,15 @@ contract SGATokenManager is ISGATokenManager, ContractAddressLocatorHolder {
     /**
      * @dev Return the contract which implements the IWalletsTradingLimiter interface.
      */
-    function getWalletsTradingLimiter() public view returns (IWalletsTradingLimiter) {
-        return IWalletsTradingLimiter(getContractAddress(_WalletsTradingLimiter_SGATokenManager_));
+    function getSellWalletsTradingLimiter() public view returns (IWalletsTradingLimiter) {
+        return IWalletsTradingLimiter(getContractAddress(_SellWalletsTradingLimiter_SGATokenManager_));
+    }
+
+    /**
+     * @dev Return the contract which implements the IWalletsTradingLimiter interface.
+     */
+    function getBuyWalletsTradingLimiter() public view returns (IWalletsTradingLimiter) {
+        return IWalletsTradingLimiter(getContractAddress(_BuyWalletsTradingLimiter_SGATokenManager_));
     }
 
     /**
@@ -96,7 +103,7 @@ contract SGATokenManager is ISGATokenManager, ContractAddressLocatorHolder {
         require(getSGAAuthorizationManager().isAuthorizedToBuy(_sender), "exchanging ETH for SGA is not authorized");
         uint256 sgaAmount = getTransactionManager().buy(_ethAmount);
         emit ExchangeEthForSgaCompleted(_sender, _ethAmount, sgaAmount);
-        getWalletsTradingLimiter().updateWallet(_sender, sgaAmount);
+        getBuyWalletsTradingLimiter().updateWallet(_sender, sgaAmount);
         return sgaAmount;
     }
 
@@ -110,6 +117,7 @@ contract SGATokenManager is ISGATokenManager, ContractAddressLocatorHolder {
         require(getSGAAuthorizationManager().isAuthorizedToSell(_sender), "exchanging SGA for ETH is not authorized");
         uint256 ethAmount = getTransactionManager().sell(_sgaAmount);
         emit ExchangeSgaForEthCompleted(_sender, _sgaAmount, ethAmount);
+        getSellWalletsTradingLimiter().updateWallet(_sender, _sgaAmount);
         IPaymentManager paymentManager = getPaymentManager();
         uint256 paymentETHAmount = paymentManager.computeDifferPayment(ethAmount, msg.sender.balance);
         if (paymentETHAmount > 0)
@@ -120,25 +128,30 @@ contract SGATokenManager is ISGATokenManager, ContractAddressLocatorHolder {
 
     /**
      * @dev Handle direct SGA transfer.
+     * @dev Any authorization not required.
      * @param _sender The address of the sender.
      * @param _to The address of the destination account.
      * @param _value The amount of SGA to be transferred.
      */
     function uponTransfer(address _sender, address _to, uint256 _value) external only(_ISGAToken_) {
-        require(getSGAAuthorizationManager().isAuthorizedToTransfer(_sender, _to), "direct-transfer of SGA is not authorized");
-        getWalletsTradingLimiter().updateWallet(_to, _value);
+        _sender;
+        _to;
+        _value;
     }
 
     /**
      * @dev Handle custodian SGA transfer.
+     * @dev Any authorization not required.
      * @param _sender The address of the sender.
      * @param _from The address of the source account.
      * @param _to The address of the destination account.
      * @param _value The amount of SGA to be transferred.
      */
     function uponTransferFrom(address _sender, address _from, address _to, uint256 _value) external only(_ISGAToken_) {
-        require(getSGAAuthorizationManager().isAuthorizedToTransferFrom(_sender, _from, _to), "custodian-transfer of SGA is not authorized");
-        getWalletsTradingLimiter().updateWallet(_to, _value);
+        _sender;
+        _from;
+        _to;
+        _value;
     }
 
     /**

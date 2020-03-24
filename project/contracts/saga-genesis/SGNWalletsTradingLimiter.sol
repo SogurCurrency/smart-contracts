@@ -14,7 +14,7 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
  * @title SGN Wallets Trading Limiter.
  */
 contract SGNWalletsTradingLimiter is WalletsTradingLimiterBase {
-    string public constant VERSION = "1.0.0";
+    string public constant VERSION = "1.1.0";
 
     using SafeMath for uint256;
     using Math for uint256;
@@ -37,7 +37,7 @@ contract SGNWalletsTradingLimiter is WalletsTradingLimiterBase {
      * @dev Create the contract.
      * @param _contractAddressLocator The contract address locator.
      */
-    constructor(IContractAddressLocator _contractAddressLocator) WalletsTradingLimiterBase(_contractAddressLocator) public {}
+    constructor(IContractAddressLocator _contractAddressLocator) WalletsTradingLimiterBase(_contractAddressLocator, _BuyWalletsTradingDataSource_) public {}
 
     /**
      * @dev Return the contract which implements the ISGNConversionManager interface.
@@ -71,6 +71,22 @@ contract SGNWalletsTradingLimiter is WalletsTradingLimiterBase {
      */
     function getUpdateWalletPermittedContractLocatorIdentifier() public pure returns (bytes32){
         return _ISGNTokenManager_;
+    }
+
+    /**
+     * @dev Get the wallet override trade-limit and class.
+     * @return The wallet override trade-limit and class.
+     */
+    function getOverrideTradeLimitAndClass(address _wallet) public view returns (uint256, uint256){
+        return getAuthorizationDataSource().getBuyTradeLimitAndClass(_wallet);
+    }
+
+    /**
+     * @dev Get the wallet trade-limit.
+     * @return The wallet trade-limit.
+     */
+    function getTradeLimit(uint256 _tradeClassId) public view returns (uint256){
+        return getTradingClasses().getBuyLimit(_tradeClassId);
     }
 
     /**

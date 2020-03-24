@@ -41,11 +41,11 @@ contract("SGNWalletsTradingLimiterUnitTest", function(accounts) {
             await catchRevert(sgnWalletsTradingLimiter.updateWallet(wallet, SGN_AMOUNT, {from: nonOwner}));
         });
         it("should complete successfully when the trade-limit is zero", async function() {
-            await authorizationDataSource.set(wallet, false, 0, 0, 0);
+            await authorizationDataSource.set(wallet, false, 0, 0, 0, 0);
             await sgnWalletsTradingLimiter.updateWallet(wallet, SGN_AMOUNT);
         });
         it("should complete successfully when the trade-limit is not zero", async function() {
-            await authorizationDataSource.set(wallet, false, 0, 1, 0);
+            await authorizationDataSource.set(wallet, false, 0, 1, 1, 0);
             await sgnWalletsTradingLimiter.updateWallet(wallet, SGN_AMOUNT);
         });
     });
@@ -175,15 +175,18 @@ contract("SGNWalletsTradingLimiterUnitTest", function(accounts) {
         tradingClasses              = await artifacts.require("TradingClassesMockup"             ).new();
         sgnWalletsTradingLimiter              = await artifacts.require("SGNWalletsTradingLimiter"                   ).new(contractAddressLocatorProxy.address);
         sgnConversionManager           = await artifacts.require("SGNConversionManagerMockup"          ).new();
+
         mintManager                 = await artifacts.require("MintManagerMockup"                ).new();
 
         await contractAddressLocatorProxy.set("IAuthorizationDataSource", authorizationDataSource.address);
-        await contractAddressLocatorProxy.set("IWalletsTradingDataSource"      , walletsTradingDataSource      .address);
+        await contractAddressLocatorProxy.set("BuyWalletsTradingDataSource"      , walletsTradingDataSource      .address);
         await contractAddressLocatorProxy.set("IWalletsTLValueConverter"       , walletsTradingLimiterValueConverter       .address);
         await contractAddressLocatorProxy.set("ITradingClasses"         , tradingClasses         .address);
 
         await contractAddressLocatorProxy.set("ISGNConversionManager"         , sgnConversionManager         .address);
         await contractAddressLocatorProxy.set("IMintManager"         , mintManager         .address);
+
+
 
         await walletsTradingLimiterValueConverter.setRatio(1);
         MAX_RESOLUTION    = await sgnWalletsTradingLimiter.MAX_RESOLUTION();

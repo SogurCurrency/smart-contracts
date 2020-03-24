@@ -31,10 +31,13 @@ def run(logger):
     transactionManager          = Contract('TransactionManager'         ,[contractAddressLocatorProxy.address])
     authorizationDataSource     = Contract('AuthorizationDataSource'    ,[                                   ])
     sgaAuthorizationManager     = Contract('SGAAuthorizationManager'    ,[contractAddressLocatorProxy.address])
-    walletsTradingDataSource           = Contract('WalletsTradingDataSource'          ,[contractAddressLocatorProxy.address])
+    buyWalletsTradingDataSource              = Contract('WalletsTradingDataSource'             ,[contractAddressLocatorProxy.address        ])
+    sellWalletsTradingDataSource              = Contract('WalletsTradingDataSource'             ,[contractAddressLocatorProxy.address        ])
+    sgaBuyWalletsTradingLimiter              = Contract('SGABuyWalletsTradingLimiter'             ,[contractAddressLocatorProxy.address        ])
+    sgaSellWalletsTradingLimiter              = Contract('SGASellWalletsTradingLimiter'             ,[contractAddressLocatorProxy.address        ])
     walletsTradingLimiterValueConverter            = Contract('WalletsTradingLimiterValueConverter'           ,[                                   ])
     tradingClasses              = Contract('TradingClasses'             ,[                                   ])
-    sgaWalletsTradingLimiter              = Contract('SGAWalletsTradingLimiter'             ,[contractAddressLocatorProxy.address        ])
+
     reserveManager              = Contract('ReserveManager'             ,[contractAddressLocatorProxy.address])
     paymentManager                 = Contract('PaymentManager'                ,[contractAddressLocatorProxy.address])
     paymentQueue                   = Contract('PaymentQueue'                  ,[contractAddressLocatorProxy.address])
@@ -46,7 +49,10 @@ def run(logger):
     walletsTradingLimiterValueConverter.setter().accept(Contract.owner)
     ethConverter.setter().accept(Contract.owner)
     authorizationDataSource.setter().accept(Contract.owner)
-    authorizationDataSource.setter().upsertOne(Contract.owner,1,True,2**256-1,2**256-1,0)
+    buyWalletsTradingDataSource.setter().setAuthorizedExecutorsIdentifier( [Web3.toHex(text='BuyWalletsTLSGATokenManager'), Web3.toHex(text='WalletsTLSGNTokenManager')])
+    sellWalletsTradingDataSource.setter().setAuthorizedExecutorsIdentifier( [Web3.toHex(text='SellWalletsTLSGATokenManager')])
+
+    authorizationDataSource.setter().upsertOne(Contract.owner,1,True,2**256-1,2**256-1,2**256-1,0)
 
     testCount  = 0
     numOfTests = len(CONSTANTS)**4
@@ -78,10 +84,12 @@ def run(logger):
                         ['ISGAToken'               ,sgaToken               .address],
                         ['IAuthorizationDataSource',authorizationDataSource.address],
                         ['ISGAAuthorizationManager',sgaAuthorizationManager.address],
-                        ['IWalletsTradingDataSource'      ,walletsTradingDataSource      .address],
                         ['IWalletsTLValueConverter'       ,walletsTradingLimiterValueConverter       .address],
                         ['ITradingClasses'         ,tradingClasses         .address],
-                        ['WalletsTLSGATokenManager'         ,sgaWalletsTradingLimiter         .address],
+                        ["BuyWalletsTLSGATokenManager"         , sgaBuyWalletsTradingLimiter         .address],
+                        ["SellWalletsTLSGATokenManager"         , sgaSellWalletsTradingLimiter         .address],
+                        ['BuyWalletsTradingDataSource'      ,buyWalletsTradingDataSource      .address],
+                        ['SellWalletsTradingDataSource'      ,sellWalletsTradingDataSource      .address],
                         ['IReserveManager'         ,reserveManager         .address],
                         ['IPaymentManager'            ,paymentManager            .address],
                         ['IPaymentQueue'              ,paymentQueue              .address],
