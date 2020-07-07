@@ -46,9 +46,11 @@ contract("ShareHolderTest", function(accounts) {
         let sgaToken;
         let sgnToken;
         let contractAddressLocator;
+        let aggregatorInterfaceMockup;
         let decimals;
         before(async function() {
             contractAddressLocatorProxy = await artifacts.require("ContractAddressLocatorProxy").new();
+            aggregatorInterfaceMockup        = await artifacts.require("AggregatorInterfaceMockup"       ).new();
             redButton                   = await artifacts.require("RedButton"                  ).new();
             modelDataSource                  = await artifacts.require("ModelDataSource"                 ).new();
             modelCalculator             = await artifacts.require("ModelCalculator"            ).new();
@@ -61,7 +63,7 @@ contract("ShareHolderTest", function(accounts) {
             sgnAuthorizationManager     = await artifacts.require("SGNAuthorizationManager"    ).new(contractAddressLocatorProxy.address);
             sgaAuthorizationManager     = await artifacts.require("SGAAuthorizationManager"    ).new(contractAddressLocatorProxy.address);
             ethConverter        = await artifacts.require("ETHConverter"       ).new(contractAddressLocatorProxy.address);
-            rateApprover          = await artifacts.require("RateApprover"         ).new(contractAddressLocatorProxy.address);
+            rateApprover          = await artifacts.require("OracleRateApprover"         ).new(contractAddressLocatorProxy.address, aggregatorInterfaceMockup.address, 10000);
             transactionLimiter          = await artifacts.require("TransactionLimiter"         ).new(contractAddressLocatorProxy.address);
             transactionManager          = await artifacts.require("TransactionManager"         ).new(contractAddressLocatorProxy.address);
             sgnTokenManager             = await artifacts.require("SGNTokenManager"            ).new(contractAddressLocatorProxy.address);
@@ -126,7 +128,9 @@ contract("ShareHolderTest", function(accounts) {
             await ethConverter.accept(owner);
             await authorizationDataSource.upsertOne(owner, Date.now(), true, -1, -1, -1, 0);
             decimals = await sgnToken.decimals();
-            await rateApprover.setRateBounds(1, "0x10000000000000000", 1, 1, "0x10000000000000000",{from: owner});
+
+            await aggregatorInterfaceMockup.setLatestAnswer(100000000);
+
             await walletsTradingLimiterValueConverter.setPrice(1,1,1,{from: owner});
             await ethConverter.setPrice(1,1,1,1,1,{from: owner});
             await reconciliationAdjuster.setFactor(1,1,1,{from: owner});

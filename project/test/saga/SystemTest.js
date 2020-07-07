@@ -41,8 +41,10 @@ contract("SystemTest", function(accounts) {
         let paymentManager;
         let paymentQueue;
         let monetaryModel;
+        let aggregatorInterfaceMockup;
         before(async function() {
             contractAddressLocatorProxy = await artifacts.require("ContractAddressLocatorProxy").new();
+            aggregatorInterfaceMockup        = await artifacts.require("AggregatorInterfaceMockup"       ).new();
             redButton                   = await artifacts.require("RedButton"                  ).new();
             modelDataSource                  = await artifacts.require("ModelDataSource"                 ).new();
             modelCalculator             = await artifacts.require("ModelCalculator"            ).new();
@@ -55,7 +57,7 @@ contract("SystemTest", function(accounts) {
             sgnAuthorizationManager     = await artifacts.require("SGNAuthorizationManager"    ).new(contractAddressLocatorProxy.address);
             sgaAuthorizationManager     = await artifacts.require("SGAAuthorizationManager"    ).new(contractAddressLocatorProxy.address);
             ethConverter        = await artifacts.require("ETHConverter"       ).new(contractAddressLocatorProxy.address);
-            rateApprover          = await artifacts.require("RateApprover"         ).new(contractAddressLocatorProxy.address);
+            rateApprover          = await artifacts.require("OracleRateApprover"         ).new(contractAddressLocatorProxy.address, aggregatorInterfaceMockup.address, 10000);
             transactionLimiter          = await artifacts.require("TransactionLimiter"         ).new(contractAddressLocatorProxy.address);
             transactionManager          = await artifacts.require("TransactionManager"         ).new(contractAddressLocatorProxy.address);
             buyWalletsTradingDataSource             = await artifacts.require("WalletsTradingDataSource"            ).new(contractAddressLocatorProxy.address);
@@ -68,6 +70,7 @@ contract("SystemTest", function(accounts) {
             paymentManager                 = await artifacts.require("PaymentManager"                ).new(contractAddressLocatorProxy.address);
             paymentQueue                   = await artifacts.require("PaymentQueue"                  ).new(contractAddressLocatorProxy.address);
             monetaryModel                   = await artifacts.require("MonetaryModel"                  ).new(contractAddressLocatorProxy.address);
+
             await require("./helpers/ModelDataSource.js").initialize(modelDataSource);
             await authorizationDataSource.accept(admin, {from: owner});
             await buyWalletsTradingDataSource.setAuthorizedExecutorsIdentifier(["BuyWalletsTLSGATokenManager"], {from: owner});
@@ -133,7 +136,9 @@ contract("SystemTest", function(accounts) {
                     ]));
                     await contractAddressLocatorProxy.upgrade(contractAddressLocator.address);
                     SGA_MINTED_FOR_SGN_HOLDERS = await sgaToken.SGA_MINTED_FOR_SGN_HOLDERS();
-                    await rateApprover.setRateBounds(1, "0x10000000000000000", 1, 1, "0x10000000000000000",{from: owner});
+
+                    await aggregatorInterfaceMockup.setLatestAnswer( 100000000);
+
                     await walletsTradingLimiterValueConverter.setPrice(1,1,1,{from: owner});
                     await ethConverter.setPrice(1,1,1,1,1,{from: owner});
                     await reconciliationAdjuster.setFactor(1,1,1,{from: owner});

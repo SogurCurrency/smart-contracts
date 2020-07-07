@@ -15,7 +15,7 @@ import "openzeppelin-solidity/contracts/math/SafeMath.sol";
  * @title ETH Converter.
  */
 contract ETHConverter is IETHConverter, ContractAddressLocatorHolder, Adminable {
-    string public constant VERSION = "1.0.0";
+    string public constant VERSION = "1.1.0";
 
     using SafeMath for uint256;
 
@@ -56,18 +56,20 @@ contract ETHConverter is IETHConverter, ContractAddressLocatorHolder, Adminable 
     }
 
     /**
-    * @dev throw if called before high price set.
-    */
-    modifier onlyIfHighPriceSet() {
-        assert(highPriceN > 0 && highPriceD > 0);
+     * @dev throw if called when low rate is not approved.
+     */
+    modifier onlyApprovedLowRate() {
+        bool success = getRateApprover().approveLowRate(lowPriceN, lowPriceD);
+        require(success, "invalid ETH-SDR rate");
         _;
     }
 
     /**
-    * @dev throw if called before low price set.
-    */
-    modifier onlyIfLowPriceSet() {
-        assert(lowPriceN > 0 && lowPriceD > 0);
+     * @dev throw if called when high rate is not approved.
+     */
+    modifier onlyApprovedHighRate() {
+        bool success = getRateApprover().approveHighRate(highPriceN, highPriceD);
+        require(success, "invalid ETH-SDR rate");
         _;
     }
 
@@ -79,15 +81,13 @@ contract ETHConverter is IETHConverter, ContractAddressLocatorHolder, Adminable 
      * @param _lowPriceN The numerator of the SDR/ETH low price.
      * @param _lowPriceD The denominator of the SDR/ETH low price.
      */
-    function setPrice(uint256 _sequenceNum, uint256 _highPriceN, uint256 _highPriceD, uint256 _lowPriceN, uint256 _lowPriceD) external onlyAdmin  {
+    function setPrice(uint256 _sequenceNum, uint256 _highPriceN, uint256 _highPriceD, uint256 _lowPriceN, uint256 _lowPriceD) external onlyAdmin {
         require(1 <= _highPriceN && _highPriceN <= MAX_RESOLUTION, "high price numerator is out of range");
         require(1 <= _highPriceD && _highPriceD <= MAX_RESOLUTION, "high price denominator is out of range");
         require(1 <= _lowPriceN && _lowPriceN <= MAX_RESOLUTION, "low price numerator is out of range");
         require(1 <= _lowPriceD && _lowPriceD <= MAX_RESOLUTION, "low price denominator is out of range");
-        require(_highPriceN * _lowPriceD >= _highPriceD * _lowPriceN, "high price is smaller than low price");//will never overflow (MAX_RESOLUTION = 2^64 )
-
-        (bool success, string memory reason) = getRateApprover().approveRate(_highPriceN, _highPriceD, _lowPriceN, _lowPriceD);
-        require(success, reason);
+        require(_highPriceN * _lowPriceD >= _highPriceD * _lowPriceN, "high price is smaller than low price");
+        //will never overflow (MAX_RESOLUTION = 2^64 )
 
         if (sequenceNum < _sequenceNum) {
             sequenceNum = _sequenceNum;
@@ -108,7 +108,7 @@ contract ETHConverter is IETHConverter, ContractAddressLocatorHolder, Adminable 
      * @param _ethAmount The amount of ETH to convert.
      * @return The equivalent amount of SDR.
      */
-    function toSdrAmount(uint256 _ethAmount) external view onlyIfLowPriceSet returns (uint256) {
+    function toSdrAmount(uint256 _ethAmount) external view onlyApprovedLowRate returns (uint256) {
         return _ethAmount.mul(lowPriceN) / lowPriceD;
     }
 
@@ -117,7 +117,7 @@ contract ETHConverter is IETHConverter, ContractAddressLocatorHolder, Adminable 
      * @param _sdrAmount The amount of SDR to convert.
      * @return The equivalent amount of ETH.
      */
-    function toEthAmount(uint256 _sdrAmount) external view onlyIfHighPriceSet returns (uint256) {
+    function toEthAmount(uint256 _sdrAmount) external view onlyApprovedHighRate returns (uint256) {
         return _sdrAmount.mul(highPriceD) / highPriceN;
     }
 
@@ -126,7 +126,7 @@ contract ETHConverter is IETHConverter, ContractAddressLocatorHolder, Adminable 
      * @param _ethAmount The amount of ETH converted.
      * @return The original amount of SDR.
      */
-    function fromEthAmount(uint256 _ethAmount) external view onlyIfHighPriceSet returns (uint256) {
+    function fromEthAmount(uint256 _ethAmount) external view returns (uint256) {
         return _ethAmount.mul(highPriceN) / highPriceD;
     }
 }

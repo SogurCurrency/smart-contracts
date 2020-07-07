@@ -25,7 +25,8 @@ contract("ETHConverterUnitTest", function(accounts) {
         ethConverter        = await artifacts.require("ETHConverter"             ).new(contractAddressLocatorProxy.address);
         MAX_RESOLUTION              = await ethConverter.MAX_RESOLUTION();
         ILLEGAL_VAL                 = MAX_RESOLUTION.plus(1);
-        await rateApprover.setIsValid(true);
+        await rateApprover.setIsHighRateValid(true);
+        await rateApprover.setIsLowRateValid(true);
     });
 
     describe("security assertion:", function() {
@@ -42,9 +43,23 @@ contract("ETHConverterUnitTest", function(accounts) {
     });
 
     describe("functionality assertion:", function() {
+        beforeEach(async function() {
+            contractAddressLocatorProxy = await artifacts.require("ContractAddressLocatorProxyMockup").new();
+            transactionLimiter          = await artifacts.require("TransactionLimiterMockup"         ).new();
+            rateApprover          = await artifacts.require("RateApproverMockup"         ).new();
+            ethConverter        = await artifacts.require("ETHConverter"             ).new(contractAddressLocatorProxy.address);
+            await rateApprover.setIsHighRateValid(true);
+            await rateApprover.setIsLowRateValid(true);
+            await contractAddressLocatorProxy.set("ITransactionLimiter", transactionLimiter.address);
+            await contractAddressLocatorProxy.set("IRateApprover", rateApprover.address);
+            await ethConverter.accept(owner, {from: owner});
+
+        });
+
         it("function setPrice should abort with an error if high price is smaller than low price", async function() {
             await catchRevert(ethConverter.setPrice(SEQUENCE_NUM, HI_PRICE_N + 0, HI_PRICE_D + 1, LO_PRICE_N + 1, LO_PRICE_D + 0));
         });
+
         it("function setPrice should abort with an error if any input value is out of range", async function() {
             await catchRevert(ethConverter.setPrice(SEQUENCE_NUM, 0          , HI_PRICE_D , LO_PRICE_N , LO_PRICE_D ));
             await catchRevert(ethConverter.setPrice(SEQUENCE_NUM, ILLEGAL_VAL, HI_PRICE_D , LO_PRICE_N , LO_PRICE_D ));
@@ -55,19 +70,33 @@ contract("ETHConverterUnitTest", function(accounts) {
             await catchRevert(ethConverter.setPrice(SEQUENCE_NUM, HI_PRICE_N , HI_PRICE_D , LO_PRICE_N , 0          ));
             await catchRevert(ethConverter.setPrice(SEQUENCE_NUM, HI_PRICE_N , HI_PRICE_D , LO_PRICE_N , ILLEGAL_VAL));
         });
+        it("function toSdrAmount should abort with an error if rateApprover failing", async function() {
+            await setPrice(SEQUENCE_NUM, HI_PRICE_N , HI_PRICE_D , LO_PRICE_N , LO_PRICE_D , "PriceSaved"   );
+            await rateApprover.setIsHighRateValid(false);
+            await rateApprover.setIsLowRateValid(false);
+            await catchRevert(ethConverter.toSdrAmount(AMOUNT), "invalid ETH-SDR rate");
+            await rateApprover.setIsLowRateValid(true);
+            await ethConverter.toSdrAmount(AMOUNT);
+        });
+
         it("function toSdrAmount should abort with an error if called before setting price", async function() {
             await catchInvalidOpcode(ethConverter.toSdrAmount(AMOUNT));
         });
+
+        it("function toEthAmount should abort with an error if rateApprover failing", async function() {
+            await setPrice(SEQUENCE_NUM, HI_PRICE_N + 0, HI_PRICE_D + 0, LO_PRICE_N + 0, LO_PRICE_D + 0, "PriceSaved"   );
+            await rateApprover.setIsHighRateValid(false);
+            await rateApprover.setIsLowRateValid(false);
+            await catchRevert(ethConverter.toEthAmount(AMOUNT), "invalid ETH-SDR rate");
+            await rateApprover.setIsHighRateValid(true);
+            await ethConverter.toEthAmount(AMOUNT);
+        });
+
         it("function toEthAmount should abort with an error if called before setting price", async function() {
             await catchInvalidOpcode(ethConverter.toEthAmount(AMOUNT));
         });
         it("function fromEthAmount should abort with an error if called before setting price", async function() {
             await catchInvalidOpcode(ethConverter.fromEthAmount(AMOUNT));
-        });
-        it("function setPrice should abort with an error if rateApprover failing", async function() {
-            await rateApprover.setIsValid(false);
-            await catchRevert(ethConverter.setPrice(SEQUENCE_NUM, HI_PRICE_N + 0, HI_PRICE_D + 0, LO_PRICE_N + 0, LO_PRICE_D + 0));
-            await rateApprover.setIsValid(true);
         });
         it("function setPrice should complete successfully if all input values are within range", async function() {
             await setPrice(SEQUENCE_NUM, HI_PRICE_N + 0, HI_PRICE_D + 0, LO_PRICE_N + 0, LO_PRICE_D + 0, "PriceSaved"   );

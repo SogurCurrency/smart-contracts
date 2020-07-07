@@ -20,11 +20,12 @@ def unzip(tuples):
 
 def run(logger):
     contractAddressLocatorProxy = Contract('ContractAddressLocatorProxy',[                                   ])
+    aggregatorInterfaceMockup              = Contract('AggregatorInterfaceMockup'             ,[                                   ])
     modelCalculator             = Contract('ModelCalculator'            ,[                                   ])
     priceBandCalculator            = Contract('PriceBandCalculator'           ,[                                   ])
     reconciliationAdjuster           = Contract('ReconciliationAdjuster'          ,[                                   ])
     ethConverter        = Contract('ETHConverter'       ,[contractAddressLocatorProxy.address])
-    rateApprover        = Contract('RateApprover'       ,[contractAddressLocatorProxy.address])
+    rateApprover        = Contract('OracleRateApprover'       ,[contractAddressLocatorProxy.address, aggregatorInterfaceMockup.address, 10000])
     modelDataSource                  = Contract('ModelDataSource'                 ,[                                   ])
     monetaryModel                   = Contract('MonetaryModel'                  ,[contractAddressLocatorProxy.address])
     transactionLimiter          = Contract('TransactionLimiter'         ,[contractAddressLocatorProxy.address])
@@ -97,37 +98,51 @@ def run(logger):
                         ['ISGATokenManager'        ,sgaTokenManager        .address],
                         ["IRateApprover"           , rateApprover               .address],
                     ]))
-                    contractAddressLocatorProxy.setter().upgrade(contractAddressLocator.address)
-                    rateApprover.setter().setRateBounds(1, 0x10000000000000000,1,1,0x10000000000000000)
-                    walletsTradingLimiterValueConverter.setter().setPrice(testCount,1,1)
 
-                    reconciliationAdjuster.setter().setFactor(testCount,factorN,factorD)
-                    ethConverter.setter().setPrice(testCount,priceN,priceD,priceN,priceD)
-                    sdrInput     = reconciliationAdjuster.getter().adjustSell(MAX_SDR_AMOUNT)
-                    ethInput     = ethConverter.getter().toEthAmount(sdrInput)
-                    b_sgaOutput  = Contract.decode(sgaToken.setter({'value':ethInput}).exchange(),2,eventParams)['output']
-                    b_sdrInModel = monetaryModelState.getter().getSdrTotal()
-                    b_sgaInModel = monetaryModelState.getter().getSgaTotal()
-                    b_sgaInToken = sgaToken.getter().totalSupply()
-                    b_ethInToken = sgaToken.balance()
-                    s_ethOutput  = Contract.decode(sgaToken.setter().transfer(sgaToken.address,b_sgaOutput),2,eventParams)['output']
-                    s_sdrInModel = monetaryModelState.getter().getSdrTotal()
-                    s_sgaInModel = monetaryModelState.getter().getSgaTotal()
-                    s_sgaInToken = sgaToken.getter().totalSupply()
-                    s_ethInToken = sgaToken.balance()
-                    logger.periodic(testCount,numOfTests,'factorN      = {}'.format(int(factorN     )))
-                    logger.periodic(testCount,numOfTests,'factorD      = {}'.format(int(factorD     )))
-                    logger.periodic(testCount,numOfTests,'priceN       = {}'.format(int(priceN      )))
-                    logger.periodic(testCount,numOfTests,'priceD       = {}'.format(int(priceD      )))
-                    logger.periodic(testCount,numOfTests,'sdrInput     = {}'.format(int(sdrInput    )))
-                    logger.periodic(testCount,numOfTests,'ethInput     = {}'.format(int(ethInput    )))
-                    logger.periodic(testCount,numOfTests,'b_sgaOutput  = {}'.format(int(b_sgaOutput )))
-                    logger.periodic(testCount,numOfTests,'b_sdrInModel = {}'.format(int(b_sdrInModel)))
-                    logger.periodic(testCount,numOfTests,'b_sgaInModel = {}'.format(int(b_sgaInModel)))
-                    logger.periodic(testCount,numOfTests,'b_sgaInToken = {}'.format(int(b_sgaInToken)))
-                    logger.periodic(testCount,numOfTests,'b_ethInToken = {}'.format(int(b_ethInToken)))
-                    logger.periodic(testCount,numOfTests,'s_ethOutput  = {}'.format(int(s_ethOutput )))
-                    logger.periodic(testCount,numOfTests,'s_sdrInModel = {}'.format(int(s_sdrInModel)))
-                    logger.periodic(testCount,numOfTests,'s_sgaInModel = {}'.format(int(s_sgaInModel)))
-                    logger.periodic(testCount,numOfTests,'s_sgaInToken = {}'.format(int(s_sgaInToken)))
-                    logger.periodic(testCount,numOfTests,'s_ethInToken = {}'.format(int(s_ethInToken)))
+                    price = int((priceN/priceD)*100000000)
+                    tooLowPrice = price == 0
+
+                    try :
+                        contractAddressLocatorProxy.setter().upgrade(contractAddressLocator.address)
+
+                        aggregatorInterfaceMockup.setter().setLatestAnswer(price)
+
+                        walletsTradingLimiterValueConverter.setter().setPrice(testCount,1,1)
+
+                        reconciliationAdjuster.setter().setFactor(testCount,factorN,factorD)
+                        ethConverter.setter().setPrice(testCount,priceN,priceD,priceN,priceD)
+                        sdrInput     = reconciliationAdjuster.getter().adjustSell(MAX_SDR_AMOUNT)
+                        ethInput     = ethConverter.getter().toEthAmount(sdrInput)
+                        b_sgaOutput  = Contract.decode(sgaToken.setter({'value':ethInput}).exchange(),2,eventParams)['output']
+                        b_sdrInModel = monetaryModelState.getter().getSdrTotal()
+                        b_sgaInModel = monetaryModelState.getter().getSgaTotal()
+                        b_sgaInToken = sgaToken.getter().totalSupply()
+                        b_ethInToken = sgaToken.balance()
+                        s_ethOutput  = Contract.decode(sgaToken.setter().transfer(sgaToken.address,b_sgaOutput),2,eventParams)['output']
+                        s_sdrInModel = monetaryModelState.getter().getSdrTotal()
+                        s_sgaInModel = monetaryModelState.getter().getSgaTotal()
+                        s_sgaInToken = sgaToken.getter().totalSupply()
+                        s_ethInToken = sgaToken.balance()
+                        logger.periodic(testCount,numOfTests,'factorN      = {}'.format(int(factorN     )))
+                        logger.periodic(testCount,numOfTests,'factorD      = {}'.format(int(factorD     )))
+                        logger.periodic(testCount,numOfTests,'priceN       = {}'.format(int(priceN      )))
+                        logger.periodic(testCount,numOfTests,'priceD       = {}'.format(int(priceD      )))
+                        logger.periodic(testCount,numOfTests,'sdrInput     = {}'.format(int(sdrInput    )))
+                        logger.periodic(testCount,numOfTests,'ethInput     = {}'.format(int(ethInput    )))
+                        logger.periodic(testCount,numOfTests,'b_sgaOutput  = {}'.format(int(b_sgaOutput )))
+                        logger.periodic(testCount,numOfTests,'b_sdrInModel = {}'.format(int(b_sdrInModel)))
+                        logger.periodic(testCount,numOfTests,'b_sgaInModel = {}'.format(int(b_sgaInModel)))
+                        logger.periodic(testCount,numOfTests,'b_sgaInToken = {}'.format(int(b_sgaInToken)))
+                        logger.periodic(testCount,numOfTests,'b_ethInToken = {}'.format(int(b_ethInToken)))
+                        logger.periodic(testCount,numOfTests,'s_ethOutput  = {}'.format(int(s_ethOutput )))
+                        logger.periodic(testCount,numOfTests,'s_sdrInModel = {}'.format(int(s_sdrInModel)))
+                        logger.periodic(testCount,numOfTests,'s_sgaInModel = {}'.format(int(s_sgaInModel)))
+                        logger.periodic(testCount,numOfTests,'s_sgaInToken = {}'.format(int(s_sgaInToken)))
+                        logger.periodic(testCount,numOfTests,'s_ethInToken = {}'.format(int(s_ethInToken)))
+
+                    except Exception as e:
+                        if(tooLowPrice):
+                            logger.periodic(testCount,numOfTests,'tooLowPrice priceN {} priceD {} price {}'.format(priceN, priceD, price))
+                        else:
+                            raise e
+
