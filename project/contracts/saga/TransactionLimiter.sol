@@ -13,7 +13,7 @@ import "openzeppelin-solidity-v1.12.0/contracts/ownership/Claimable.sol";
  * @title Transaction Limiter.
  */
 contract TransactionLimiter is ITransactionLimiter, ContractAddressLocatorHolder, Claimable {
-    string public constant VERSION = "1.0.0";
+    string public constant VERSION = "2.0.0";
 
     using SafeMath for uint256;
 
@@ -28,14 +28,19 @@ contract TransactionLimiter is ITransactionLimiter, ContractAddressLocatorHolder
     uint256 public totalSell;
 
     /**
-     * @dev Maximum difference permitted.
+     * @dev Maximum buy difference permitted.
      */
-    uint256 public maxDiff = uint256(~0);
+    uint256 public maxBuyDiff = uint256(~0);
+
+    /**
+     * @dev Maximum sell difference permitted.
+     */
+    uint256 public maxSellDiff = uint256(~0);
 
     uint256 public sequenceNum = 0;
 
-    event MaxDiffSaved(uint256 _maxDiff);
-    event MaxDiffNotSaved(uint256 _maxDiff);
+    event MaxDiffSaved(uint256 _maxBuyDiff, uint256 _maxSellDiff);
+    event MaxDiffNotSaved(uint256 _maxBuyDiff, uint256 _maxSellDiff);
 
     /**
      * @dev Create the contract.
@@ -46,17 +51,19 @@ contract TransactionLimiter is ITransactionLimiter, ContractAddressLocatorHolder
     /**
      * @dev Set the maximum difference permitted.
      * @param _sequenceNum The sequence-number of the operation.
-     * @param _maxDiff The maximum difference permitted.
+     * @param _maxBuyDiff The maximum buy difference permitted.
+     * @param _maxSellDiff The maximum sell difference permitted.
      */
-    function setMaxDiff(uint256 _sequenceNum, uint256 _maxDiff) external onlyOwner {
+    function setMaxDiff(uint256 _sequenceNum, uint256 _maxBuyDiff, uint256 _maxSellDiff) external onlyOwner {
         if (sequenceNum < _sequenceNum) {
             sequenceNum = _sequenceNum;
-            maxDiff = _maxDiff;
+            maxBuyDiff = _maxBuyDiff;
+            maxSellDiff = _maxSellDiff;
 
-            emit MaxDiffSaved(_maxDiff);
+            emit MaxDiffSaved(_maxBuyDiff, _maxSellDiff);
         }
         else {
-            emit MaxDiffNotSaved(_maxDiff);
+            emit MaxDiffNotSaved(_maxBuyDiff, _maxSellDiff);
         }
     }
 
@@ -75,7 +82,7 @@ contract TransactionLimiter is ITransactionLimiter, ContractAddressLocatorHolder
     function incTotalBuy(uint256 _amount) external only(_ITransactionManager_) {
         totalBuy = totalBuy.add(_amount);
         if (totalBuy > totalSell)
-            require(totalBuy - totalSell <= maxDiff, "buy-limit has been reached");
+            require(totalBuy - totalSell <= maxBuyDiff, "buy-limit has been reached");
     }
 
     /**
@@ -85,6 +92,6 @@ contract TransactionLimiter is ITransactionLimiter, ContractAddressLocatorHolder
     function incTotalSell(uint256 _amount) external only(_ITransactionManager_) {
         totalSell = totalSell.add(_amount);
         if (totalSell > totalBuy)
-            require(totalSell - totalBuy <= maxDiff, "sell-limit has been reached");
+            require(totalSell - totalBuy <= maxSellDiff, "sell-limit has been reached");
     }
 }
