@@ -7,14 +7,14 @@ import "openzeppelin-solidity/contracts/math/Math.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
 /**
- * Details of usage of licenced software see here: https://www.saga.org/software/readme_v1
+ * Details of usage of licenced software see here: https://www.sogur.com/software/readme_v1
  */
 
 /**
  * @title SGN Wallets Trading Limiter.
  */
 contract SGNWalletsTradingLimiter is WalletsTradingLimiterBase {
-    string public constant VERSION = "1.1.0";
+    string public constant VERSION = "1.1.1";
 
     using SafeMath for uint256;
     using Math for uint256;
@@ -126,8 +126,8 @@ contract SGNWalletsTradingLimiter is WalletsTradingLimiterBase {
      * @return The limiter value worth of the given SGN.
      */
     function calcSGNConversionValue(uint256 _sgnAmount) private view returns (uint256) {
-        uint256 sgaAmount = getSGNConversionManager().sgn2sga(_sgnAmount, getMintManager().getIndex());
-        return getWalletsTradingLimiterValueConverter().toLimiterValue(sgaAmount);
+        uint256 sgrAmount = getSGNConversionManager().sgn2sgr(_sgnAmount, getMintManager().getIndex());
+        return getWalletsTradingLimiterValueConverter().toLimiterValue(sgrAmount);
     }
 
 

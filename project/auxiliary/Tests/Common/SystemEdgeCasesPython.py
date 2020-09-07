@@ -7,14 +7,14 @@ from MonetaryModelState         import MonetaryModelState
 from MonetaryModel              import MonetaryModel
 from TransactionLimiter     import TransactionLimiter    
 from TransactionManager     import TransactionManager    
-from SGAToken               import SGAToken              
+from SGRToken               import SGRToken              
 
 
 from Common.ModelDataSource import initialize
 
 
 CONSTANTS = [(2**16)**n for n in range(0,5)]
-MAX_SDR_AMOUNT = 500786938745138896681892746900
+MAX_SDR_AMOUNT = 500028600499998013465789011863
 
 
 def run(logger,modelCalculator,priceBandCalculator,ReconciliationAdjuster,ETHConverter):
@@ -50,39 +50,39 @@ def run(logger,modelCalculator,priceBandCalculator,ReconciliationAdjuster,ETHCon
                     mintManager      = MintManager     (contractAddressLocator)
                     intervalIterator = IntervalIterator(contractAddressLocator)
                     monetaryModelState   = MonetaryModelState  (contractAddressLocator)
-                    sgaToken         = SGAToken        (contractAddressLocator)
+                    sgrToken         = SGRToken        (contractAddressLocator)
                     contractAddressLocator.set('MintingPointTimersManager'     ,mintingPointTimersManager     )
                     contractAddressLocator.set('MintManager'     ,mintManager     )
                     contractAddressLocator.set('IntervalIterator',intervalIterator)
                     contractAddressLocator.set('MonetaryModelState'  ,monetaryModelState  )
-                    contractAddressLocator.set('SGAToken'        ,sgaToken        )
+                    contractAddressLocator.set('SGRToken'        ,sgrToken        )
                     reconciliationAdjuster.setFactor(testCount,factorN,factorD)
                     ethConverter.setPrice(testCount,priceN,priceD,priceN,priceD)
                     sdrInput     = reconciliationAdjuster.adjustSell(MAX_SDR_AMOUNT)
                     ethInput     = ethConverter.toEthAmount(sdrInput)
-                    b_sgaOutput  = sgaToken.buy(ethInput)
+                    b_sgrOutput  = sgrToken.buy(ethInput)
                     b_sdrInModel = monetaryModelState.getSdrTotal()
-                    b_sgaInModel = monetaryModelState.getSgaTotal()
-                    b_sgaInToken = sgaToken.sgaTotal
-                    b_ethInToken = sgaToken.ethTotal
-                    s_ethOutput  = sgaToken.sell(b_sgaOutput)
+                    b_sgrInModel = monetaryModelState.getSgrTotal()
+                    b_sgrInToken = sgrToken.sgrTotal
+                    b_ethInToken = sgrToken.ethTotal
+                    s_ethOutput  = sgrToken.sell(b_sgrOutput)
                     s_sdrInModel = monetaryModelState.getSdrTotal()
-                    s_sgaInModel = monetaryModelState.getSgaTotal()
-                    s_sgaInToken = sgaToken.sgaTotal
-                    s_ethInToken = sgaToken.ethTotal
+                    s_sgrInModel = monetaryModelState.getSgrTotal()
+                    s_sgrInToken = sgrToken.sgrTotal
+                    s_ethInToken = sgrToken.ethTotal
                     logger.periodic(testCount,numOfTests,'factorN      = {}'.format(int(factorN     )))
                     logger.periodic(testCount,numOfTests,'factorD      = {}'.format(int(factorD     )))
                     logger.periodic(testCount,numOfTests,'priceN       = {}'.format(int(priceN      )))
                     logger.periodic(testCount,numOfTests,'priceD       = {}'.format(int(priceD      )))
                     logger.periodic(testCount,numOfTests,'sdrInput     = {}'.format(int(sdrInput    )))
                     logger.periodic(testCount,numOfTests,'ethInput     = {}'.format(int(ethInput    )))
-                    logger.periodic(testCount,numOfTests,'b_sgaOutput  = {}'.format(int(b_sgaOutput )))
+                    logger.periodic(testCount,numOfTests,'b_sgrOutput  = {}'.format(int(b_sgrOutput )))
                     logger.periodic(testCount,numOfTests,'b_sdrInModel = {}'.format(int(b_sdrInModel)))
-                    logger.periodic(testCount,numOfTests,'b_sgaInModel = {}'.format(int(b_sgaInModel)))
-                    logger.periodic(testCount,numOfTests,'b_sgaInToken = {}'.format(int(b_sgaInToken)))
+                    logger.periodic(testCount,numOfTests,'b_sgrInModel = {}'.format(int(b_sgrInModel)))
+                    logger.periodic(testCount,numOfTests,'b_sgrInToken = {}'.format(int(b_sgrInToken)))
                     logger.periodic(testCount,numOfTests,'b_ethInToken = {}'.format(int(b_ethInToken)))
                     logger.periodic(testCount,numOfTests,'s_ethOutput  = {}'.format(int(s_ethOutput )))
                     logger.periodic(testCount,numOfTests,'s_sdrInModel = {}'.format(int(s_sdrInModel)))
-                    logger.periodic(testCount,numOfTests,'s_sgaInModel = {}'.format(int(s_sgaInModel)))
-                    logger.periodic(testCount,numOfTests,'s_sgaInToken = {}'.format(int(s_sgaInToken)))
+                    logger.periodic(testCount,numOfTests,'s_sgrInModel = {}'.format(int(s_sgrInModel)))
+                    logger.periodic(testCount,numOfTests,'s_sgrInToken = {}'.format(int(s_sgrInToken)))
                     logger.periodic(testCount,numOfTests,'s_ethInToken = {}'.format(int(s_ethInToken)))

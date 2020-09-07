@@ -4,7 +4,7 @@ import "../utils/Adminable.sol";
 import "./interfaces/IAuthorizationDataSource.sol";
 
 /**
- * Details of usage of licenced software see here: https://www.saga.org/software/readme_v1
+ * Details of usage of licenced software see here: https://www.sogur.com/software/readme_v1
  */
 
 /**

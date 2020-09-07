@@ -12,7 +12,7 @@ contract SGNConversionManagerMockup is ISGNConversionManager {
         ratio = _ratio;
     }
 
-    function sgn2sga(uint256 _amount, uint256 _index) external view returns (uint256) {
+    function sgn2sgr(uint256 _amount, uint256 _index) external view returns (uint256) {
         _index;
         return ratio.mul(_amount);
     }

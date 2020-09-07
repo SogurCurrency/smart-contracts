@@ -1,6 +1,6 @@
 module.exports.Flag = {
-    BuySga          : 0,
-    SellSga         : 1,
+    BuySgr          : 0,
+    SellSgr         : 1,
     SellSgn         : 2,
     ReceiveSgn      : 3,
     TransferSgn     : 4,

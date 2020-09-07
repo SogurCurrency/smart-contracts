@@ -17,7 +17,7 @@ DEFAULT_LOG_LEVEL   = 'DEBUG' # DEBUG/INFO/WARNING/ERROR/CRITICAL
 
 class Logger():
     def __init__(self):
-        self.logger   = getLogger('SAGA')
+        self.logger   = getLogger('SOGUR')
         self.debug    = self.logger.debug
         self.info     = self.logger.info
         self.warning  = self.logger.warning

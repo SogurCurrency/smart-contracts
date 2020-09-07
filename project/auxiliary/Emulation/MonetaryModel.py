@@ -6,84 +6,84 @@ class MonetaryModel():
         monetaryModelState = self.contractAddressLocator.get('MonetaryModelState');
         intervalIterator = self.contractAddressLocator.get('IntervalIterator');
 
-        sgaTotal = monetaryModelState.getSgaTotal();
+        sgrTotal = monetaryModelState.getSgrTotal();
         (alpha, beta) = intervalIterator.getCurrentIntervalCoefs();
-        sdrAmountAfterFee = self.contractAddressLocator.get('PriceBandCalculator').buy(_sdrAmount, sgaTotal, alpha, beta);
-        sgaAmount = self.buyFunc(sdrAmountAfterFee, monetaryModelState, intervalIterator);
+        sdrAmountAfterFee = self.contractAddressLocator.get('PriceBandCalculator').buy(_sdrAmount, sgrTotal, alpha, beta);
+        sgrAmount = self.buyFunc(sdrAmountAfterFee, monetaryModelState, intervalIterator);
 
-        return sgaAmount;
+        return sgrAmount;
 
-    def sell(self, _sgaAmount):
+    def sell(self, _sgrAmount):
         monetaryModelState = self.contractAddressLocator.get('MonetaryModelState');
         intervalIterator = self.contractAddressLocator.get('IntervalIterator');
 
-        sgaTotal = monetaryModelState.getSgaTotal();
+        sgrTotal = monetaryModelState.getSgrTotal();
         (alpha, beta) = intervalIterator.getCurrentIntervalCoefs();
-        sdrAmountBeforeFee = self.sellFunc(_sgaAmount, monetaryModelState, intervalIterator);
-        sdrAmount = self.contractAddressLocator.get('PriceBandCalculator').sell(sdrAmountBeforeFee, sgaTotal, alpha, beta);
+        sdrAmountBeforeFee = self.sellFunc(_sgrAmount, monetaryModelState, intervalIterator);
+        sdrAmount = self.contractAddressLocator.get('PriceBandCalculator').sell(sdrAmountBeforeFee, sgrTotal, alpha, beta);
 
         return sdrAmount;
 
     def buyFunc(self, _sdrAmount, _monetaryModelState, _intervalIterator):
-        sgaCount = 0;
+        sgrCount = 0;
         sdrCount = _sdrAmount;
 
         sdrTotal = _monetaryModelState.getSdrTotal();
-        sgaTotal = _monetaryModelState.getSgaTotal();
+        sgrTotal = _monetaryModelState.getSgrTotal();
 
         (minN, maxN, minR, maxR, alpha, beta) = _intervalIterator.getCurrentInterval();
         while (sdrCount >= maxR - sdrTotal):
             sdrDelta = maxR - sdrTotal;
-            sgaDelta = maxN - sgaTotal;
+            sgrDelta = maxN - sgrTotal;
             _intervalIterator.grow();
             (minN, maxN, minR, maxR, alpha, beta) = _intervalIterator.getCurrentInterval();
             sdrTotal = minR;
-            sgaTotal = minN;
+            sgrTotal = minN;
             sdrCount -= sdrDelta;
-            sgaCount += sgaDelta;
+            sgrCount += sgrDelta;
 
         if (sdrCount > 0):
             if (self.contractAddressLocator.get('ModelCalculator').isTrivialInterval(alpha, beta)):
-                sgaDelta = self.contractAddressLocator.get('ModelCalculator').getValN(sdrCount, maxN, maxR);
+                sgrDelta = self.contractAddressLocator.get('ModelCalculator').getValN(sdrCount, maxN, maxR);
             else:
-                sgaDelta = self.contractAddressLocator.get('ModelCalculator').getNewN(sdrTotal + sdrCount, minR, minN, alpha, beta) - sgaTotal;
+                sgrDelta = self.contractAddressLocator.get('ModelCalculator').getNewN(sdrTotal + sdrCount, minR, minN, alpha, beta) - sgrTotal;
             sdrTotal += sdrCount;
-            sgaTotal += sgaDelta;
-            sgaCount += sgaDelta;
+            sgrTotal += sgrDelta;
+            sgrCount += sgrDelta;
 
         _monetaryModelState.setSdrTotal(sdrTotal);
-        _monetaryModelState.setSgaTotal(sgaTotal);
+        _monetaryModelState.setSgrTotal(sgrTotal);
 
-        return sgaCount;
+        return sgrCount;
 
-    def sellFunc(self, _sgaAmount, _monetaryModelState, _intervalIterator):
+    def sellFunc(self, _sgrAmount, _monetaryModelState, _intervalIterator):
         sdrCount = 0;
-        sgaCount = _sgaAmount;
+        sgrCount = _sgrAmount;
 
-        sgaTotal = _monetaryModelState.getSgaTotal();
+        sgrTotal = _monetaryModelState.getSgrTotal();
         sdrTotal = _monetaryModelState.getSdrTotal();
 
         (minN, maxN, minR, maxR, alpha, beta) = _intervalIterator.getCurrentInterval();
-        while (sgaCount > sgaTotal - minN):
-            sgaDelta = sgaTotal - minN;
+        while (sgrCount > sgrTotal - minN):
+            sgrDelta = sgrTotal - minN;
             sdrDelta = sdrTotal - minR;
             _intervalIterator.shrink();
             (minN, maxN, minR, maxR, alpha, beta) = _intervalIterator.getCurrentInterval();
-            sgaTotal = maxN;
+            sgrTotal = maxN;
             sdrTotal = maxR;
-            sgaCount -= sgaDelta;
+            sgrCount -= sgrDelta;
             sdrCount += sdrDelta;
 
-        if (sgaCount > 0):
+        if (sgrCount > 0):
             if (self.contractAddressLocator.get('ModelCalculator').isTrivialInterval(alpha, beta)):
-                sdrDelta = self.contractAddressLocator.get('ModelCalculator').getValR(sgaCount, maxR, maxN);
+                sdrDelta = self.contractAddressLocator.get('ModelCalculator').getValR(sgrCount, maxR, maxN);
             else:
-                sdrDelta = sdrTotal - self.contractAddressLocator.get('ModelCalculator').getNewR(sgaTotal - sgaCount, minN, minR, alpha, beta);
-            sgaTotal -= sgaCount;
+                sdrDelta = sdrTotal - self.contractAddressLocator.get('ModelCalculator').getNewR(sgrTotal - sgrCount, minN, minR, alpha, beta);
+            sgrTotal -= sgrCount;
             sdrTotal -= sdrDelta;
             sdrCount += sdrDelta;
 
-        _monetaryModelState.setSgaTotal(sgaTotal);
+        _monetaryModelState.setSgrTotal(sgrTotal);
         _monetaryModelState.setSdrTotal(sdrTotal);
 
         return sdrCount;

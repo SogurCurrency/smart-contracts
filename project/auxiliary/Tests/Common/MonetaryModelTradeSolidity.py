@@ -24,16 +24,16 @@ def run(fileName,logger):
         elif command['operation'] == 'buy':
             Contract.jump(command['elapsed'])
             sdrAmount = dec2wei(command['amount'])
-            sgaAmount = Contract.decode(monetaryModel.setter().buy(sdrAmount),0,eventParams)['output']
-            logger.debug('buy: {:.2f} SDR ==> {:.2f} SGA'.format(wei2dec(sdrAmount),wei2dec(sgaAmount)))
+            sgrAmount = Contract.decode(monetaryModel.setter().buy(sdrAmount),0,eventParams)['output']
+            logger.debug('buy: {:.2f} SDR ==> {:.2f} SGR'.format(wei2dec(sdrAmount),wei2dec(sgrAmount)))
         elif command['operation'] == 'sell':
             Contract.jump(command['elapsed'])
-            sgaAmount = dec2wei(command['amount'])
-            sdrAmount = Contract.decode(monetaryModel.setter().sell(sgaAmount),0,eventParams)['output']
-            logger.debug('sell: {:.2f} SGA ==> {:.2f} SDR'.format(wei2dec(sgaAmount),wei2dec(sdrAmount)))
+            sgrAmount = dec2wei(command['amount'])
+            sdrAmount = Contract.decode(monetaryModel.setter().sell(sgrAmount),0,eventParams)['output']
+            logger.debug('sell: {:.2f} SGR ==> {:.2f} SDR'.format(wei2dec(sgrAmount),wei2dec(sdrAmount)))
         elif command['operation'] == 'info':
             logger.debug('SDR = {:.2f}'.format(wei2dec(monetaryModelState.getter().getSdrTotal())))
-            logger.debug('SGA = {:.2f}'.format(wei2dec(monetaryModelState.getter().getSgaTotal())))
+            logger.debug('SGR = {:.2f}'.format(wei2dec(monetaryModelState.getter().getSgrTotal())))
         else:
             logger.debug('Undefined operation')
     logger.info('Done')

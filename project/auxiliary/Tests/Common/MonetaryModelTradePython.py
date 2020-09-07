@@ -21,16 +21,16 @@ def run(fileName,logger,modelCalculator,priceBandCalculator):
         elif command['operation'] == 'buy':
             mintingPointTimersManager.now += command['elapsed']
             sdrAmount = dec2wei(command['amount'])
-            sgaAmount = monetaryModel.buy(sdrAmount)
-            logger.debug('buy: {:.2f} SDR ==> {:.2f} SGA'.format(wei2dec(sdrAmount),wei2dec(sgaAmount)))
+            sgrAmount = monetaryModel.buy(sdrAmount)
+            logger.debug('buy: {:.2f} SDR ==> {:.2f} SGR'.format(wei2dec(sdrAmount),wei2dec(sgrAmount)))
         elif command['operation'] == 'sell':
             mintingPointTimersManager.now += command['elapsed']
-            sgaAmount = dec2wei(command['amount'])
-            sdrAmount = monetaryModel.sell(sgaAmount)
-            logger.debug('sell: {:.2f} SGA ==> {:.2f} SDR'.format(wei2dec(sgaAmount),wei2dec(sdrAmount)))
+            sgrAmount = dec2wei(command['amount'])
+            sdrAmount = monetaryModel.sell(sgrAmount)
+            logger.debug('sell: {:.2f} SGR ==> {:.2f} SDR'.format(wei2dec(sgrAmount),wei2dec(sdrAmount)))
         elif command['operation'] == 'info':
             logger.debug('SDR = {:.2f}'.format(wei2dec(monetaryModelState.getSdrTotal())))
-            logger.debug('SGA = {:.2f}'.format(wei2dec(monetaryModelState.getSgaTotal())))
+            logger.debug('SGR = {:.2f}'.format(wei2dec(monetaryModelState.getSgrTotal())))
         else:
             logger.debug('Undefined operation')
     logger.info('Done')

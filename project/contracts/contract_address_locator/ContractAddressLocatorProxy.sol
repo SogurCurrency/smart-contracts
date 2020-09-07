@@ -4,7 +4,7 @@ import "./interfaces/IContractAddressLocator.sol";
 import "openzeppelin-solidity-v1.12.0/contracts/ownership/Claimable.sol";
 
 /**
- * Details of usage of licenced software see here: https://www.saga.org/software/readme_v1
+ * Details of usage of licenced software see here: https://www.sogur.com/software/readme_v1
  */
 
 /**

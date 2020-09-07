@@ -5,14 +5,14 @@ import "./interfaces/IWalletsTradingLimiterValueConverter.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
 /**
- * Details of usage of licenced software see here: https://www.saga.org/software/readme_v1
+ * Details of usage of licenced software see here: https://www.sogur.com/software/readme_v1
  */
 
 /**
  * @title Wallets Trading Limiter Value Converter.
  */
 contract WalletsTradingLimiterValueConverter is IWalletsTradingLimiterValueConverter, Adminable {
-    string public constant VERSION = "1.0.0";
+    string public constant VERSION = "1.0.1";
 
     using SafeMath for uint256;
 
@@ -52,12 +52,12 @@ contract WalletsTradingLimiterValueConverter is IWalletsTradingLimiterValueConve
     }
 
     /**
-     * @dev Get the current limiter worth of a given SGA amount.
-     * @param _sgaAmount The amount of SGA to convert.
+     * @dev Get the current limiter worth of a given SGR amount.
+     * @param _sgrAmount The amount of SGR to convert.
      * @return The equivalent limiter amount.
      */
-    function toLimiterValue(uint256 _sgaAmount) external view returns (uint256) {
+    function toLimiterValue(uint256 _sgrAmount) external view returns (uint256) {
         assert(priceN > 0 && priceD > 0);
-        return _sgaAmount.mul(priceN) / priceD;
+        return _sgrAmount.mul(priceN) / priceD;
     }
 }

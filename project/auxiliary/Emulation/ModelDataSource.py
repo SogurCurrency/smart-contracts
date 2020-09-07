@@ -10,7 +10,7 @@ class ModelDataSource():
 
     def __init__(self):
         self.intervalListsLocked = False;
-        self.intervalLists = [[ModelDataSource.Interval(0, 0, 0, 0, 0, 0) for c in range(11)] for r in range(105)];
+        self.intervalLists = [[ModelDataSource.Interval(0, 0, 0, 0, 0, 0) for c in range(11)] for r in range(95)];
 
     def lock(self):
         self.intervalListsLocked = True;

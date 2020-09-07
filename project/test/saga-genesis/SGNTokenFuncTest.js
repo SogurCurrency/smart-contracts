@@ -153,12 +153,12 @@ contract("SGNTokenFuncTest", function(accounts) {
             it(`index ${index}`, async function() {
                 await mintManager.setIndex(index);
                 const prevState = await getState(initWallet);
-                const sgaAmount = await sgnToken.convert(sgnAmount);
-                await sagaExchanger.mintSgaForSgnHolders(sgaAmount);
+                const sgrAmount = await sgnToken.convert(sgnAmount);
+                await sagaExchanger.mintSgaForSgnHolders(sgrAmount);
                 await sgnToken.transfer(sgnToken.address, sgnAmount, {from: initWallet});
                 const nextState = await getState(initWallet);
                 assert(prevState.sgn.minus(nextState.sgn).equals(sgnAmount), `sgn: ${prevState.sgn} - ${nextState.sgn} != ${sgnAmount}`);
-                assert(nextState.sga.minus(prevState.sga).equals(sgaAmount), `sga: ${nextState.sga} - ${prevState.sga} != ${sgaAmount}`);
+                assert(nextState.sgr.minus(prevState.sgr).equals(sgrAmount), `sgr: ${nextState.sgr} - ${prevState.sgr} != ${sgrAmount}`);
             });
         }
     });
@@ -209,7 +209,7 @@ contract("SGNTokenFuncTest", function(accounts) {
     }
 
     async function getState(wallet) {
-        return {sgn: await sgnToken.balanceOf(wallet), sga: await sagaExchanger.balanceOf(wallet)};
+        return {sgn: await sgnToken.balanceOf(wallet), sgr: await sagaExchanger.balanceOf(wallet)};
     }
 
     async function assertBalance(wallet, expected) {

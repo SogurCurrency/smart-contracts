@@ -56,7 +56,7 @@ contract("SGNTokenManagerUnitTest", function(accounts) {
             await walletsTradingLimiterMockup.setPass(true);
         });
         it("function exchangeSgnForSga should complete successfully", async function() {
-            await verifyEvent(sgnTokenManager.exchangeSgnForSga(senderWallet, AMOUNT), "ExchangeSgnForSgaCompleted");
+            await verifyEvent(sgnTokenManager.exchangeSgnForSga(senderWallet, AMOUNT), "ExchangeSgnForSgrCompleted");
         });
         it("function uponTransfer should complete successfully", async function() {
             await verifyEvent(sgnTokenManager.uponTransfer(senderWallet, targetWallet, AMOUNT), "");
@@ -108,11 +108,11 @@ contract("SGNTokenManagerUnitTest", function(accounts) {
     });
 
     describe("conversion assertion:", function() {
-        it("function convertSgnToSga should return the correct amount", async function() {
+        it("function convertSgnToSgr should return the correct amount", async function() {
             const amount = await sgnTokenManager.convertSgnToSga(AMOUNT);
             assert(amount.equals(AMOUNT), `expected = ${AMOUNT}, actual = ${amount}`);
         });
-        it("function convertSgnToSga should abort with an error if MintManager is not connected", async function() {
+        it("function convertSgnToSgr should abort with an error if MintManager is not connected", async function() {
             await contractAddressLocatorProxy.set("IMintManager", nullAddress);
             await catchRevert(sgnTokenManager.convertSgnToSga(AMOUNT));
             await contractAddressLocatorProxy.set("IMintManager", mintManager.address);

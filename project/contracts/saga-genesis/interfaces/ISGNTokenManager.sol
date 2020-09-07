@@ -5,17 +5,17 @@ pragma solidity 0.4.25;
  */
 interface ISGNTokenManager {
     /**
-     * @dev Get the current SGA worth of a given SGN amount.
+     * @dev Get the current SGR worth of a given SGN amount.
      * @param _sgnAmount The amount of SGN to convert.
-     * @return The equivalent amount of SGA.
+     * @return The equivalent amount of SGR.
      */
     function convertSgnToSga(uint256 _sgnAmount) external view returns (uint256);
 
     /**
-     * @dev Exchange SGN for SGA.
+     * @dev Exchange SGN for SGR.
      * @param _sender The address of the sender.
      * @param _sgnAmount The amount of SGN received.
-     * @return The amount of SGA that the sender is entitled to.
+     * @return The amount of SGR that the sender is entitled to.
      */
     function exchangeSgnForSga(address _sender, uint256 _sgnAmount) external returns (uint256);
 

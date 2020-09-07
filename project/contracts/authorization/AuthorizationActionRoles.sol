@@ -7,16 +7,16 @@ library AuthorizationActionRoles {
     string public constant VERSION = "1.1.0";
 
     enum Flag {
-        BuySga         ,
-        SellSga        ,
+        BuySgr         ,
+        SellSgr        ,
         SellSgn        ,
         ReceiveSgn     ,
         TransferSgn    ,
         TransferFromSgn
     }
 
-    function isAuthorizedToBuySga         (uint256 _flags) internal pure returns (bool) {return isAuthorized(_flags, Flag.BuySga         );}
-    function isAuthorizedToSellSga        (uint256 _flags) internal pure returns (bool) {return isAuthorized(_flags, Flag.SellSga        );}
+    function isAuthorizedToBuySgr         (uint256 _flags) internal pure returns (bool) {return isAuthorized(_flags, Flag.BuySgr         );}
+    function isAuthorizedToSellSgr        (uint256 _flags) internal pure returns (bool) {return isAuthorized(_flags, Flag.SellSgr        );}
     function isAuthorizedToSellSgn        (uint256 _flags) internal pure returns (bool) {return isAuthorized(_flags, Flag.SellSgn        );}
     function isAuthorizedToReceiveSgn     (uint256 _flags) internal pure returns (bool) {return isAuthorized(_flags, Flag.ReceiveSgn     );}
     function isAuthorizedToTransferSgn    (uint256 _flags) internal pure returns (bool) {return isAuthorized(_flags, Flag.TransferSgn    );}

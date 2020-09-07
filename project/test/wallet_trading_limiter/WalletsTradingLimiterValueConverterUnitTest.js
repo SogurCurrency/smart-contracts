@@ -70,7 +70,7 @@ contract("WalletsTradingLimiterValueConverterUnitTest", function(accounts) {
         });
     }
 
-    async function toLimiterValue(sgaAmount) {return await walletsTradingLimiterValueConverter.toLimiterValue(sgaAmount);}
+    async function toLimiterValue(sgrAmount) {return await walletsTradingLimiterValueConverter.toLimiterValue(sgrAmount);}
 
-    function toLimiterValueFunc(sgaAmount, priceN, priceD) {return Math.floor(sgaAmount * priceN / priceD);}
+    function toLimiterValueFunc(sgrAmount, priceN, priceD) {return Math.floor(sgrAmount * priceN / priceD);}
 });

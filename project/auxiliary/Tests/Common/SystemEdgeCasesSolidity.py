@@ -4,7 +4,7 @@ from Common.ModelDataSource import initialize
 
 
 CONSTANTS = [(2**16)**n for n in range(0,5)]
-MAX_SDR_AMOUNT = 500786938745138896681892746900
+MAX_SDR_AMOUNT = 500028600499998013465789011863
 
 
 eventParams = [
@@ -31,11 +31,11 @@ def run(logger):
     transactionLimiter          = Contract('TransactionLimiter'         ,[contractAddressLocatorProxy.address])
     transactionManager          = Contract('TransactionManager'         ,[contractAddressLocatorProxy.address])
     authorizationDataSource     = Contract('AuthorizationDataSource'    ,[                                   ])
-    sgaAuthorizationManager     = Contract('SGAAuthorizationManager'    ,[contractAddressLocatorProxy.address])
+    sgrAuthorizationManager     = Contract('SGRAuthorizationManager'    ,[contractAddressLocatorProxy.address])
     buyWalletsTradingDataSource              = Contract('WalletsTradingDataSource'             ,[contractAddressLocatorProxy.address        ])
     sellWalletsTradingDataSource              = Contract('WalletsTradingDataSource'             ,[contractAddressLocatorProxy.address        ])
-    sgaBuyWalletsTradingLimiter              = Contract('SGABuyWalletsTradingLimiter'             ,[contractAddressLocatorProxy.address        ])
-    sgaSellWalletsTradingLimiter              = Contract('SGASellWalletsTradingLimiter'             ,[contractAddressLocatorProxy.address        ])
+    sgrBuyWalletsTradingLimiter              = Contract('SGRBuyWalletsTradingLimiter'             ,[contractAddressLocatorProxy.address        ])
+    sgrSellWalletsTradingLimiter              = Contract('SGRSellWalletsTradingLimiter'             ,[contractAddressLocatorProxy.address        ])
     walletsTradingLimiterValueConverter            = Contract('WalletsTradingLimiterValueConverter'           ,[                                   ])
     tradingClasses              = Contract('TradingClasses'             ,[                                   ])
 
@@ -43,15 +43,15 @@ def run(logger):
     paymentManager                 = Contract('PaymentManager'                ,[contractAddressLocatorProxy.address])
     paymentQueue                   = Contract('PaymentQueue'                  ,[contractAddressLocatorProxy.address])
     redButton                   = Contract('RedButton'                  ,[                                   ])
-    sgaTokenManager             = Contract('SGATokenManager'            ,[contractAddressLocatorProxy.address])
+    sgrTokenManager             = Contract('SGRTokenManager'            ,[contractAddressLocatorProxy.address])
 
     initialize(modelDataSource.setter(),logger)
 
     walletsTradingLimiterValueConverter.setter().accept(Contract.owner)
     ethConverter.setter().accept(Contract.owner)
     authorizationDataSource.setter().accept(Contract.owner)
-    buyWalletsTradingDataSource.setter().setAuthorizedExecutorsIdentifier( [Web3.toHex(text='BuyWalletsTLSGATokenManager'), Web3.toHex(text='WalletsTLSGNTokenManager')])
-    sellWalletsTradingDataSource.setter().setAuthorizedExecutorsIdentifier( [Web3.toHex(text='SellWalletsTLSGATokenManager')])
+    buyWalletsTradingDataSource.setter().setAuthorizedExecutorsIdentifier( [Web3.toHex(text='BuyWalletsTLSGRTokenManager'), Web3.toHex(text='WalletsTLSGNTokenManager')])
+    sellWalletsTradingDataSource.setter().setAuthorizedExecutorsIdentifier( [Web3.toHex(text='SellWalletsTLSGRTokenManager')])
 
     authorizationDataSource.setter().upsertOne(Contract.owner,1,True,2**256-1,2**256-1,2**256-1,0)
 
@@ -68,7 +68,7 @@ def run(logger):
                     mintManager            = Contract('MintManager'           ,[contractAddressLocatorProxy.address       ])
                     intervalIterator       = Contract('IntervalIterator'      ,[contractAddressLocatorProxy.address       ])
                     monetaryModelState         = Contract('MonetaryModelState'        ,[contractAddressLocatorProxy.address       ])
-                    sgaToken               = Contract('SGAToken'              ,[contractAddressLocatorProxy.address       ])
+                    sgrToken               = Contract('SGRToken'              ,[contractAddressLocatorProxy.address       ])
                     contractAddressLocator = Contract('ContractAddressLocator',unzip([
                         ['IModelCalculator'        ,modelCalculator        .address],
                         ['IPriceBandCalculator'       ,priceBandCalculator       .address],
@@ -82,20 +82,20 @@ def run(logger):
                         ['IMonetaryModel'              ,monetaryModel              .address],
                         ['ITransactionLimiter'     ,transactionLimiter     .address],
                         ['ITransactionManager'     ,transactionManager     .address],
-                        ['ISGAToken'               ,sgaToken               .address],
+                        ['ISGRToken'               ,sgrToken               .address],
                         ['IAuthorizationDataSource',authorizationDataSource.address],
-                        ['ISGAAuthorizationManager',sgaAuthorizationManager.address],
+                        ['ISGRAuthorizationManager',sgrAuthorizationManager.address],
                         ['IWalletsTLValueConverter'       ,walletsTradingLimiterValueConverter       .address],
                         ['ITradingClasses'         ,tradingClasses         .address],
-                        ["BuyWalletsTLSGATokenManager"         , sgaBuyWalletsTradingLimiter         .address],
-                        ["SellWalletsTLSGATokenManager"         , sgaSellWalletsTradingLimiter         .address],
+                        ["BuyWalletsTLSGRTokenManager"         , sgrBuyWalletsTradingLimiter         .address],
+                        ["SellWalletsTLSGRTokenManager"         , sgrSellWalletsTradingLimiter         .address],
                         ['BuyWalletsTradingDataSource'      ,buyWalletsTradingDataSource      .address],
                         ['SellWalletsTradingDataSource'      ,sellWalletsTradingDataSource      .address],
                         ['IReserveManager'         ,reserveManager         .address],
                         ['IPaymentManager'            ,paymentManager            .address],
                         ['IPaymentQueue'              ,paymentQueue              .address],
                         ['IRedButton'              ,redButton              .address],
-                        ['ISGATokenManager'        ,sgaTokenManager        .address],
+                        ['ISGRTokenManager'        ,sgrTokenManager        .address],
                         ["IRateApprover"           , rateApprover               .address],
                     ]))
 
@@ -113,31 +113,31 @@ def run(logger):
                         ethConverter.setter().setPrice(testCount,priceN,priceD,priceN,priceD)
                         sdrInput     = reconciliationAdjuster.getter().adjustSell(MAX_SDR_AMOUNT)
                         ethInput     = ethConverter.getter().toEthAmount(sdrInput)
-                        b_sgaOutput  = Contract.decode(sgaToken.setter({'value':ethInput}).exchange(),2,eventParams)['output']
+                        b_sgrOutput  = Contract.decode(sgrToken.setter({'value':ethInput}).exchange(),2,eventParams)['output']
                         b_sdrInModel = monetaryModelState.getter().getSdrTotal()
-                        b_sgaInModel = monetaryModelState.getter().getSgaTotal()
-                        b_sgaInToken = sgaToken.getter().totalSupply()
-                        b_ethInToken = sgaToken.balance()
-                        s_ethOutput  = Contract.decode(sgaToken.setter().transfer(sgaToken.address,b_sgaOutput),2,eventParams)['output']
+                        b_sgrInModel = monetaryModelState.getter().getSgrTotal()
+                        b_sgrInToken = sgrToken.getter().totalSupply()
+                        b_ethInToken = sgrToken.balance()
+                        s_ethOutput  = Contract.decode(sgrToken.setter().transfer(sgrToken.address,b_sgrOutput),2,eventParams)['output']
                         s_sdrInModel = monetaryModelState.getter().getSdrTotal()
-                        s_sgaInModel = monetaryModelState.getter().getSgaTotal()
-                        s_sgaInToken = sgaToken.getter().totalSupply()
-                        s_ethInToken = sgaToken.balance()
+                        s_sgrInModel = monetaryModelState.getter().getSgrTotal()
+                        s_sgrInToken = sgrToken.getter().totalSupply()
+                        s_ethInToken = sgrToken.balance()
                         logger.periodic(testCount,numOfTests,'factorN      = {}'.format(int(factorN     )))
                         logger.periodic(testCount,numOfTests,'factorD      = {}'.format(int(factorD     )))
                         logger.periodic(testCount,numOfTests,'priceN       = {}'.format(int(priceN      )))
                         logger.periodic(testCount,numOfTests,'priceD       = {}'.format(int(priceD      )))
                         logger.periodic(testCount,numOfTests,'sdrInput     = {}'.format(int(sdrInput    )))
                         logger.periodic(testCount,numOfTests,'ethInput     = {}'.format(int(ethInput    )))
-                        logger.periodic(testCount,numOfTests,'b_sgaOutput  = {}'.format(int(b_sgaOutput )))
+                        logger.periodic(testCount,numOfTests,'b_sgrOutput  = {}'.format(int(b_sgrOutput )))
                         logger.periodic(testCount,numOfTests,'b_sdrInModel = {}'.format(int(b_sdrInModel)))
-                        logger.periodic(testCount,numOfTests,'b_sgaInModel = {}'.format(int(b_sgaInModel)))
-                        logger.periodic(testCount,numOfTests,'b_sgaInToken = {}'.format(int(b_sgaInToken)))
+                        logger.periodic(testCount,numOfTests,'b_sgrInModel = {}'.format(int(b_sgrInModel)))
+                        logger.periodic(testCount,numOfTests,'b_sgrInToken = {}'.format(int(b_sgrInToken)))
                         logger.periodic(testCount,numOfTests,'b_ethInToken = {}'.format(int(b_ethInToken)))
                         logger.periodic(testCount,numOfTests,'s_ethOutput  = {}'.format(int(s_ethOutput )))
                         logger.periodic(testCount,numOfTests,'s_sdrInModel = {}'.format(int(s_sdrInModel)))
-                        logger.periodic(testCount,numOfTests,'s_sgaInModel = {}'.format(int(s_sgaInModel)))
-                        logger.periodic(testCount,numOfTests,'s_sgaInToken = {}'.format(int(s_sgaInToken)))
+                        logger.periodic(testCount,numOfTests,'s_sgrInModel = {}'.format(int(s_sgrInModel)))
+                        logger.periodic(testCount,numOfTests,'s_sgrInToken = {}'.format(int(s_sgrInToken)))
                         logger.periodic(testCount,numOfTests,'s_ethInToken = {}'.format(int(s_ethInToken)))
 
                     except Exception as e:

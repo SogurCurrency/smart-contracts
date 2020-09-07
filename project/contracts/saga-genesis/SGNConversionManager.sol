@@ -3,139 +3,129 @@ pragma solidity 0.4.25;
 import "./interfaces/ISGNConversionManager.sol";
 
 /**
- * Details of usage of licenced software see here: https://www.saga.org/software/readme_v1
+ * Details of usage of licenced software see here: https://www.sogur.com/software/readme_v1
  */
 
 /**
  * @title SGN Conversion Manager.
- * @dev Calculate the conversion of SGN to SGA.
+ * @dev Calculate the conversion of SGN to SGR.
  * @notice Some of the code has been auto-generated via 'PrintSGNConversionManager.py',
- * in compliance with 'Saga Monetary Model.pdf' / APPENDIX D: SAGA MODEL POINTS.
+ * in compliance with 'Sogur Monetary Model.pdf' / APPENDIX D: SOGUR MODEL POINTS.
  */
 contract SGNConversionManager is ISGNConversionManager {
-    string public constant VERSION = "1.0.0";
+    string public constant VERSION = "1.1.0";
 
     uint256 public constant MAX_AMOUNT = 107000000e18;
 
     uint256 public constant DENOMINATOR = 1000000;
 
-    uint256[105] public numerators;
+    uint256[95] public numerators;
 
     constructor() public {
-        numerators[  0] =        0;
-        numerators[  1] =        0;
-        numerators[  2] =     2500;
-        numerators[  3] =    22650;
-        numerators[  4] =    22650;
-        numerators[  5] =    63504;
-        numerators[  6] =   125680;
-        numerators[  7] =   125680;
-        numerators[  8] =   209810;
-        numerators[  9] =   316560;
-        numerators[ 10] =   446570;
-        numerators[ 11] =   600530;
-        numerators[ 12] =   779120;
-        numerators[ 13] =   983070;
-        numerators[ 14] =   983070;
-        numerators[ 15] =  1213000;
-        numerators[ 16] =  1213000;
-        numerators[ 17] =  1267300;
-        numerators[ 18] =  1324800;
-        numerators[ 19] =  1385500;
-        numerators[ 20] =  1449200;
-        numerators[ 21] =  1515900;
-        numerators[ 22] =  1585500;
-        numerators[ 23] =  1657900;
-        numerators[ 24] =  1733000;
-        numerators[ 25] =  1810800;
-        numerators[ 26] =  1810800;
-        numerators[ 27] =  1884500;
-        numerators[ 28] =  1960500;
-        numerators[ 29] =  2038700;
-        numerators[ 30] =  2119000;
-        numerators[ 31] =  2201400;
-        numerators[ 32] =  2285900;
-        numerators[ 33] =  2372400;
-        numerators[ 34] =  2460900;
-        numerators[ 35] =  2551400;
-        numerators[ 36] =  2551400;
-        numerators[ 37] =  2636300;
-        numerators[ 38] =  2722900;
-        numerators[ 39] =  2811200;
-        numerators[ 40] =  2901100;
-        numerators[ 41] =  2992700;
-        numerators[ 42] =  3085900;
-        numerators[ 43] =  3180700;
-        numerators[ 44] =  3277100;
-        numerators[ 45] =  3375000;
-        numerators[ 46] =  3474500;
-        numerators[ 47] =  3575500;
-        numerators[ 48] =  3678100;
-        numerators[ 49] =  3782200;
-        numerators[ 50] =  3887800;
-        numerators[ 51] =  3994800;
-        numerators[ 52] =  4103300;
-        numerators[ 53] =  4216300;
-        numerators[ 54] =  4333800;
-        numerators[ 55] =  4455700;
-        numerators[ 56] =  4581900;
-        numerators[ 57] =  4712400;
-        numerators[ 58] =  4847200;
-        numerators[ 59] =  4986200;
-        numerators[ 60] =  5129400;
-        numerators[ 61] =  5276800;
-        numerators[ 62] =  5428400;
-        numerators[ 63] =  5584200;
-        numerators[ 64] =  5744100;
-        numerators[ 65] =  5908300;
-        numerators[ 66] =  6076700;
-        numerators[ 67] =  6076700;
-        numerators[ 68] =  6249300;
-        numerators[ 69] =  6426100;
-        numerators[ 70] =  6607100;
-        numerators[ 71] =  6792300;
-        numerators[ 72] =  6981600;
-        numerators[ 73] =  7175100;
-        numerators[ 74] =  7372700;
-        numerators[ 75] =  7574500;
-        numerators[ 76] =  7780400;
-        numerators[ 77] =  7990400;
-        numerators[ 78] =  8204500;
-        numerators[ 79] =  8422700;
-        numerators[ 80] =  8645000;
-        numerators[ 81] =  8871400;
-        numerators[ 82] =  9101900;
-        numerators[ 83] =  9336500;
-        numerators[ 84] =  9575200;
-        numerators[ 85] =  9818000;
-        numerators[ 86] = 10064000;
-        numerators[ 87] = 10320000;
-        numerators[ 88] = 10585000;
-        numerators[ 89] = 10860000;
-        numerators[ 90] = 11144000;
-        numerators[ 91] = 11438000;
-        numerators[ 92] = 11742000;
-        numerators[ 93] = 12056000;
-        numerators[ 94] = 12380000;
-        numerators[ 95] = 12380000;
-        numerators[ 96] = 12714000;
-        numerators[ 97] = 13058000;
-        numerators[ 98] = 13411000;
-        numerators[ 99] = 13774000;
-        numerators[100] = 14145000;
-        numerators[101] = 14525000;
-        numerators[102] = 14913000;
-        numerators[103] = 15000000;
-        numerators[104] = 15000000;
+        numerators[0] = 0;
+        numerators[1] = 0;
+        numerators[2] = 0;
+        numerators[3] = 13514;
+        numerators[4] = 13514;
+        numerators[5] = 29794;
+        numerators[6] = 60279;
+        numerators[7] = 98386;
+        numerators[8] = 155680;
+        numerators[9] = 220880;
+        numerators[10] = 297550;
+        numerators[11] = 381820;
+        numerators[12] = 475340;
+        numerators[13] = 585540;
+        numerators[14] = 594430;
+        numerators[15] = 626090;
+        numerators[16] = 626090;
+        numerators[17] = 658600;
+        numerators[18] = 658600;
+        numerators[19] = 685580;
+        numerators[20] = 716700;
+        numerators[21] = 750640;
+        numerators[22] = 752880;
+        numerators[23] = 783970;
+        numerators[24] = 819060;
+        numerators[25] = 855700;
+        numerators[26] = 855700;
+        numerators[27] = 890860;
+        numerators[28] = 894550;
+        numerators[29] = 926680;
+        numerators[30] = 963090;
+        numerators[31] = 1000800;
+        numerators[32] = 1039700;
+        numerators[33] = 1079500;
+        numerators[34] = 1120300;
+        numerators[35] = 1162000;
+        numerators[36] = 1162000;
+        numerators[37] = 1204100;
+        numerators[38] = 1244600;
+        numerators[39] = 1285400;
+        numerators[40] = 1327000;
+        numerators[41] = 1411600;
+        numerators[42] = 1493600;
+        numerators[43] = 1622100;
+        numerators[44] = 1763400;
+        numerators[45] = 1911900;
+        numerators[46] = 1983200;
+        numerators[47] = 2041700;
+        numerators[48] = 2099400;
+        numerators[49] = 2158700;
+        numerators[50] = 2219800;
+        numerators[51] = 2283000;
+        numerators[52] = 2348100;
+        numerators[53] = 2415100;
+        numerators[54] = 2484300;
+        numerators[55] = 2555400;
+        numerators[56] = 2628600;
+        numerators[57] = 2703700;
+        numerators[58] = 2780800;
+        numerators[59] = 2859900;
+        numerators[60] = 2859900;
+        numerators[61] = 2940200;
+        numerators[62] = 3023000;
+        numerators[63] = 3107900;
+        numerators[64] = 3194700;
+        numerators[65] = 3283500;
+        numerators[66] = 3374200;
+        numerators[67] = 3466900;
+        numerators[68] = 3561500;
+        numerators[69] = 3658000;
+        numerators[70] = 3756400;
+        numerators[71] = 3856800;
+        numerators[72] = 3959000;
+        numerators[73] = 4063200;
+        numerators[74] = 4253500;
+        numerators[75] = 4468200;
+        numerators[76] = 4693600;
+        numerators[77] = 4837900;
+        numerators[78] = 4967000;
+        numerators[79] = 5096300;
+        numerators[80] = 5228800;
+        numerators[81] = 5365500;
+        numerators[82] = 5506600;
+        numerators[83] = 5653400;
+        numerators[84] = 5653400;
+        numerators[85] = 5803000;
+        numerators[86] = 5958100;
+        numerators[87] = 6118100;
+        numerators[88] = 6282400;
+        numerators[89] = 6451200;
+        numerators[90] = 6623900;
+        numerators[91] = 6800700;
+        numerators[92] = 6981300;
+        numerators[93] = 7057400;
+        numerators[94] = 7057400;
     }
 
     /**
-     * @dev Compute the amount of SGA received upon conversion of a given SGN amount at a given minting-point.
+     * @dev Compute the amount of SGR received upon conversion of a given SGN amount at a given minting-point.
      * @param _amount The amount of SGN.
      * @param _index The minting-point index.
-     * @return The amount of SGA received upon conversion.
+     * @return The amount of SGR received upon conversion.
      */
-    function sgn2sga(uint256 _amount, uint256 _index) external view returns (uint256) {
+    function sgn2sgr(uint256 _amount, uint256 _index) external view returns (uint256) {
         assert(_amount <= MAX_AMOUNT);
         assert(_index < numerators.length);
         return _amount * numerators[_index] / DENOMINATOR;

@@ -8,7 +8,7 @@ class MintingPointTimersManager():
         self.contractAddressLocator = _contractAddressLocator;
         self.now = 1;
         self.timeout = _timeout;
-        self.timestamps = [MintingPointTimersManager.Timestamp(False, 0) for r in range(105)];
+        self.timestamps = [MintingPointTimersManager.Timestamp(False, 0) for r in range(95)];
 
     def start(self, _id):
         timestamp = self.timestamps[_id];

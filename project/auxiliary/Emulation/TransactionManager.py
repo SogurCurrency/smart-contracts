@@ -5,12 +5,12 @@ class TransactionManager():
     def buy(self, _ethAmount):
         sdrAmount = self.contractAddressLocator.get('ETHConverter').toSdrAmount(_ethAmount);
         newAmount = self.contractAddressLocator.get('ReconciliationAdjuster').adjustBuy(sdrAmount);
-        sgaAmount = self.contractAddressLocator.get('MonetaryModel').buy(newAmount);
+        sgrAmount = self.contractAddressLocator.get('MonetaryModel').buy(newAmount);
         self.contractAddressLocator.get('TransactionLimiter').incTotalBuy(sdrAmount);
-        return sgaAmount;
+        return sgrAmount;
 
-    def sell(self, _sgaAmount):
-        sdrAmount = self.contractAddressLocator.get('MonetaryModel').sell(_sgaAmount);
+    def sell(self, _sgrAmount):
+        sdrAmount = self.contractAddressLocator.get('MonetaryModel').sell(_sgrAmount);
         newAmount = self.contractAddressLocator.get('ReconciliationAdjuster').adjustSell(sdrAmount);
         ethAmount = self.contractAddressLocator.get('ETHConverter').toEthAmount(newAmount);
         self.contractAddressLocator.get('TransactionLimiter').incTotalSell(sdrAmount);

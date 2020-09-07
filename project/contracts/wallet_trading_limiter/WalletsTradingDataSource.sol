@@ -6,7 +6,7 @@ import "../contract_address_locator/ContractAddressLocatorHolder.sol";
 import "openzeppelin-solidity/contracts/math/SafeMath.sol";
 
 /**
- * Details of usage of licenced software see here: https://www.saga.org/software/readme_v1
+ * Details of usage of licenced software see here: https://www.sogur.com/software/readme_v1
  */
 
 /**

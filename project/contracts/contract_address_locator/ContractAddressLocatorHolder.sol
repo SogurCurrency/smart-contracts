@@ -26,11 +26,14 @@ contract ContractAddressLocatorHolder {
     bytes32 internal constant _IRedButton_               = "IRedButton"              ;
     bytes32 internal constant _IReserveManager_          = "IReserveManager"         ;
     bytes32 internal constant _ISagaExchanger_           = "ISagaExchanger"          ;
+    bytes32 internal constant _ISogurExchanger_           = "ISogurExchanger"          ;
+    bytes32 internal constant _SgnToSgrExchangeInitiator_ = "SgnToSgrExchangeInitiator"          ;
     bytes32 internal constant _IMonetaryModel_               = "IMonetaryModel"              ;
     bytes32 internal constant _IMonetaryModelState_          = "IMonetaryModelState"         ;
-    bytes32 internal constant _ISGAAuthorizationManager_ = "ISGAAuthorizationManager";
-    bytes32 internal constant _ISGAToken_                = "ISGAToken"               ;
-    bytes32 internal constant _ISGATokenManager_         = "ISGATokenManager"        ;
+    bytes32 internal constant _ISGRAuthorizationManager_ = "ISGRAuthorizationManager";
+    bytes32 internal constant _ISGRToken_                = "ISGRToken"               ;
+    bytes32 internal constant _ISGRTokenManager_         = "ISGRTokenManager"        ;
+    bytes32 internal constant _ISGRTokenInfo_         = "ISGRTokenInfo"        ;
     bytes32 internal constant _ISGNAuthorizationManager_ = "ISGNAuthorizationManager";
     bytes32 internal constant _ISGNToken_                = "ISGNToken"               ;
     bytes32 internal constant _ISGNTokenManager_         = "ISGNTokenManager"        ;
@@ -40,12 +43,13 @@ contract ContractAddressLocatorHolder {
     bytes32 internal constant _BuyWalletsTradingDataSource_       = "BuyWalletsTradingDataSource"      ;
     bytes32 internal constant _SellWalletsTradingDataSource_       = "SellWalletsTradingDataSource"      ;
     bytes32 internal constant _WalletsTradingLimiter_SGNTokenManager_          = "WalletsTLSGNTokenManager"         ;
-    bytes32 internal constant _BuyWalletsTradingLimiter_SGATokenManager_          = "BuyWalletsTLSGATokenManager"         ;
-    bytes32 internal constant _SellWalletsTradingLimiter_SGATokenManager_          = "SellWalletsTLSGATokenManager"         ;
+    bytes32 internal constant _BuyWalletsTradingLimiter_SGRTokenManager_          = "BuyWalletsTLSGRTokenManager"         ;
+    bytes32 internal constant _SellWalletsTradingLimiter_SGRTokenManager_          = "SellWalletsTLSGRTokenManager"         ;
     bytes32 internal constant _IETHConverter_             = "IETHConverter"   ;
     bytes32 internal constant _ITransactionLimiter_      = "ITransactionLimiter"     ;
     bytes32 internal constant _ITransactionManager_      = "ITransactionManager"     ;
     bytes32 internal constant _IRateApprover_      = "IRateApprover"     ;
+    bytes32 internal constant _SGAToSGRInitializer_      = "SGAToSGRInitializer"     ;
 
     IContractAddressLocator private contractAddressLocator;
 

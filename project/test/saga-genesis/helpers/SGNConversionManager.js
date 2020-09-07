@@ -1,2 +1,2 @@
-module.exports.arrayLength = 105;
-module.exports.minValidIndex = 2;
+module.exports.arrayLength = 95;
+module.exports.minValidIndex = 3;

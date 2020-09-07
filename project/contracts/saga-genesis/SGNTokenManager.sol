@@ -8,16 +8,16 @@ import "../wallet_trading_limiter/interfaces/IWalletsTradingLimiter.sol";
 import "../contract_address_locator/ContractAddressLocatorHolder.sol";
 
 /**
- * Details of usage of licenced software see here: https://www.saga.org/software/readme_v1
+ * Details of usage of licenced software see here: https://www.sogur.com/software/readme_v1
  */
 
 /**
  * @title SGN Token Manager.
  */
 contract SGNTokenManager is ISGNTokenManager, ContractAddressLocatorHolder {
-    string public constant VERSION = "1.0.0";
+    string public constant VERSION = "1.0.1";
 
-    event ExchangeSgnForSgaCompleted(address indexed _user, uint256 _input, uint256 _output);
+    event ExchangeSgnForSgrCompleted(address indexed _user, uint256 _input, uint256 _output);
     event MintSgnVestedInDelayCompleted(uint256 _value);
 
     /**
@@ -55,26 +55,28 @@ contract SGNTokenManager is ISGNTokenManager, ContractAddressLocatorHolder {
     }
 
     /**
-     * @dev Get the current SGA worth of a given SGN amount.
+     * @dev Get the current SGR worth of a given SGN amount.
+       function name is convertSgnToSga and not convertSgnToSgr for backward compatibility.
      * @param _sgnAmount The amount of SGN to convert.
-     * @return The equivalent amount of SGA.
+     * @return The equivalent amount of SGR.
      */
     function convertSgnToSga(uint256 _sgnAmount) external view returns (uint256) {
-        return convertSgnToSgaFunc(_sgnAmount);
+        return convertSgnToSgrFunc(_sgnAmount);
     }
 
     /**
-     * @dev Exchange SGN for SGA.
+     * @dev Exchange SGN for SGR.
+       function name is exchangeSgnForSga and not exchangeSgnForSgr for backward compatibility.
      * @param _sender The address of the sender.
      * @param _sgnAmount The amount of SGN received.
-     * @return The amount of SGA that the sender is entitled to.
+     * @return The amount of SGR that the sender is entitled to.
      */
     function exchangeSgnForSga(address _sender, uint256 _sgnAmount) external only(_ISGNToken_) returns (uint256) {
-        require(getSGNAuthorizationManager().isAuthorizedToSell(_sender), "exchanging SGN for SGA is not authorized");
-        uint256 sgaAmount = convertSgnToSgaFunc(_sgnAmount);
-        require(sgaAmount > 0, "returned amount is zero");
-        emit ExchangeSgnForSgaCompleted(_sender, _sgnAmount, sgaAmount);
-        return sgaAmount;
+        require(getSGNAuthorizationManager().isAuthorizedToSell(_sender), "exchanging SGN for SGR is not authorized");
+        uint256 sgrAmount = convertSgnToSgrFunc(_sgnAmount);
+        require(sgrAmount > 0, "returned amount is zero");
+        emit ExchangeSgnForSgrCompleted(_sender, _sgnAmount, sgrAmount);
+        return sgrAmount;
     }
 
     /**
@@ -111,11 +113,11 @@ contract SGNTokenManager is ISGNTokenManager, ContractAddressLocatorHolder {
     }
 
     /**
-     * @dev  Get the amount of SGA received upon conversion of a given SGN amount.
+     * @dev  Get the amount of SGR received upon conversion of a given SGN amount.
      * @param _sgnAmount the amount of SGN to convert.
-     * @return The amount of SGA received upon conversion .
+     * @return The amount of SGR received upon conversion .
      */
-    function convertSgnToSgaFunc(uint256 _sgnAmount) private view returns (uint256) {
-        return getSGNConversionManager().sgn2sga(_sgnAmount, getMintManager().getIndex());
+    function convertSgnToSgrFunc(uint256 _sgnAmount) private view returns (uint256) {
+        return getSGNConversionManager().sgn2sgr(_sgnAmount, getMintManager().getIndex());
     }
 }

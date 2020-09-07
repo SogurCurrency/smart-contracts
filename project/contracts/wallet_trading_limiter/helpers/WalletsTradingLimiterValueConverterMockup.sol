@@ -9,8 +9,8 @@ contract WalletsTradingLimiterValueConverterMockup is IWalletsTradingLimiterValu
 
     uint256 private ratio;
 
-    function toLimiterValue(uint256 _sgaAmount) external view returns (uint256) {
-        return ratio.mul(_sgaAmount);
+    function toLimiterValue(uint256 _sgrAmount) external view returns (uint256) {
+        return ratio.mul(_sgrAmount);
     }
 
     function setRatio(uint256 _ratio) external {

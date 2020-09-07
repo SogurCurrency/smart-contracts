@@ -9,7 +9,7 @@ class MintManager():
     def updateMintingState(self):
         if (self.isMintingStateOutdated()):
             amount = self.contractAddressLocator.get('ModelDataSource').getRequiredMintAmount(self.index);
-            self.contractAddressLocator.get('MintListener').mintSgaForSgnHolders(amount);
+            self.contractAddressLocator.get('MintListener').mintSgrForSgnHolders(amount);
             self.index += 1;
 
     def getIndex(self):
