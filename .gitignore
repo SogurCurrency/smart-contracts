@@ -1,4 +1,18 @@
+# node
+node_modules
+npm-debug.log
+
 # python
 *.pyc
+
+# truffle compile
+project/build/contracts
+
+# solidity-coverage
+project/allFiredEvents
+project/coverageEnv
+project/coverage
+project/coverage.json
+project/scTopics
 
 .idea/*

@@ -1,0 +1,40 @@
+{
+  "name": "Sogur",
+  "version": "1.0.0",
+  "description": "Sogur",
+  "main": "project/truffle-config.js",
+  "scripts": {
+    "install": "node scripts/fix-modules.js",
+    "build": "node scripts/rebuild-all.js",
+    "test": "node scripts/run-tests.js",
+    "verify": "node scripts/verify.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SogurCurrency/smart-contracts"
+  },
+  "author": "Sogur",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SogurCurrency/smart-contracts/issues"
+  },
+  "homepage": "https://github.com/SogurCurrency/smart-contracts#readme",
+  "devDependencies": {
+    "websocket": "^1.0.0",
+    "bignumber.js": "^8.0.0",
+    "decimal.js": "^10.0.0",
+    "download-file": "^0.1.5",
+    "truffle": "4.1.15",
+    "ganache-cli": "6.4.1",
+    "solidity-coverage": "0.5.11",
+    "openzeppelin-solidity": "2.0.0",
+    "openzeppelin-solidity-v1.12.0": "npm:openzeppelin-solidity@1.12.0",
+    "truffle-flattener": "1.2.10",
+    "ethereumjs-util": "6.1.0",
+    "web3": "1.0.0-beta.34"
+  },
+  "//": "on windows, also run npm install --global --production windows-build-tools",
+  "dependencies": {
+    "@chainlink/contracts": "0.0.3"
+  }
+}
