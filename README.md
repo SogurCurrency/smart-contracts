@@ -35,4 +35,16 @@ The conversion is done by either:
   2. calling the `transfer(to, value)` function, with the contract's address as `to` and the amount to be converted as `value`.
 
 
+## Test instructions
+Instructions for runnig JS tests in both truffle and solidity coverage libraries.    
+
+Using node version v10.16.3  & npm version 6.9.0.    
+ 
+1. clone or download this repository on branch master
+2. enter smart-contracts folder
+3. run `npm install`
+4. run `npm run build`
+5. run `npm run test 1` for running all tests using truffle or run `npm run test 2` for running all tests using solidity coverage.
+
+
 ###### *Special thanks to [barakman](https://github.com/barakman) for his contribution*
